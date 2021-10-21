@@ -1,0 +1,12 @@
+venv/
+saved/
+saved_video/
+hellchang_gradproj/
+utils/*.mp4
+.idea/**
+*.ipynb
+.scratch.ipynb
+.utils/*_old.py
+*.csv
+*.txt
+*_test.py
