@@ -1,3 +1,12 @@
 from streamlit_webrtc import webrtc_streamer
+from streamlit_webrtc import RTCConfiguration
 
-webrtc_streamer(key="example")
+RTC_CONFIGURATION = RTCConfiguration({
+      "RTCIceServer": [{
+        "urls": ["turn:turn.chosangnimiswatching.ml:5349"],
+        "username": "guest",
+        "credential": "somepassword",
+      }]}
+)
+
+webrtc_streamer(key="example", rtc_configuration=RTC_CONFIGURATION)
