@@ -4,8 +4,8 @@ from streamlit_webrtc import RTCConfiguration
 RTC_CONFIGURATION = RTCConfiguration({
       "RTCIceServer": [{
         "urls": ["turn:turn.chosangnimiswatching.ml:3478"],
-        "username": "guest",
-        "credential": "somepassword",
+        "username": "brucewayne",
+        "credential": "12345",
       }]}
 )
 
