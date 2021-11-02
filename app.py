@@ -1,12 +1,13 @@
 from streamlit_webrtc import webrtc_streamer
-from streamlit_webrtc import RTCConfiguration
+import av
 
-RTC_CONFIGURATION = RTCConfiguration({
-      "RTCIceServer": [{
-        "urls": ["turn:turn.chosangnimiswatching.ml:3478"],
-        "username": "brucewayne",
-        "credential": "12345",
-      }]}
-)
+class VideoProcessor:
+    def recv(self, frame):
+        img = frame.to_ndarray(format="bgr24")
 
-webrtc_streamer(key="example", rtc_configuration=RTC_CONFIGURATION)
+        flipped = img[::-1,:,:]
+
+        return av.VideoFrame.from_ndarray(flipped, format="bgr24")
+
+
+webrtc_streamer(key="example", video_processor_factory=VideoProcessor)
