@@ -75,7 +75,7 @@ class ShoulderP:
         return ud
 
     @classmethod
-    def draw_circle(cls, frame, coordinates, frame_width, frame_height):
+    def draw_circle(cls, frame, coordinates, frame_height, frame_width):
         import cv2
         _, right_wrist_x, right_wrist_y = coordinates[4]
         _, left_wrist_x, left_wrist_y = coordinates[8]
@@ -88,7 +88,6 @@ class ShoulderP:
             frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
             frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
             frame = cv2.resize(cv2.flip(frame, 1), (1000, 1000))
-            cv2.imshow('EfficientPose (Groos et al., 2020)', frame)
         else:
             if cls.rate_r > -1 and cls.rate_l > -1:
                 frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_r), 1)
@@ -97,7 +96,7 @@ class ShoulderP:
                 frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
                 frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
             frame = cv2.resize(cv2.flip(frame, 1), (1000, 1000))
-            cv2.imshow('EfficientPose (Groos et al., 2020)', frame)
+        return frame
 
 
 
