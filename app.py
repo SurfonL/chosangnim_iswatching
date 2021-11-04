@@ -1,9 +1,9 @@
 import cv2
 from streamlit_webrtc import webrtc_streamer
 import av
-from utils.ShoulderP import ShoulderP
-from os.path import join, normpath
-from utils import helpers
+# from utils.ShoulderP import ShoulderP
+# from os.path import join, normpath
+# from utils import helpers
 
 
 #resolution
