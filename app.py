@@ -17,25 +17,25 @@ class VideoProcessor:
         frame = frame.to_ndarray(format="bgr24")
 
         #batch인데 어차피 1임
-        batch = [frame[...,::-1]]
-
-        framework_name = 'tflite'
-        model_name = 'I_lite'
-        framework = framework_name.lower()
-        model_variant = model_name.lower()
-        lite = True if model_variant.endswith('_lite') else False
-        frame_height, frame_width = frame.shape[:2]
-
-        model, resolution = self.get_model(framework, model_variant)
-
-        # Preprocess batch
-        batch = helpers.preprocess(batch, resolution, lite)
-        batch_outputs = self.infer(batch, model, lite, framework)
-
-        # Extract coordinates for frame
-        frame_coordinates = helpers.extract_coordinates(batch_outputs[0, ...], frame_width, frame_height, real_time=True)
-
-        frame = ShoulderP.draw_circle(frame, frame_coordinates, frame_width, frame_height)
+        # batch = [frame[...,::-1]]
+        #
+        # framework_name = 'tflite'
+        # model_name = 'I_lite'
+        # framework = framework_name.lower()
+        # model_variant = model_name.lower()
+        # lite = True if model_variant.endswith('_lite') else False
+        # frame_height, frame_width = frame.shape[:2]
+        #
+        # model, resolution = self.get_model(framework, model_variant)
+        #
+        # # Preprocess batch
+        # batch = helpers.preprocess(batch, resolution, lite)
+        # batch_outputs = self.infer(batch, model, lite, framework)
+        #
+        # # Extract coordinates for frame
+        # frame_coordinates = helpers.extract_coordinates(batch_outputs[0, ...], frame_width, frame_height, real_time=True)
+        #
+        # frame = ShoulderP.draw_circle(frame, frame_coordinates, frame_width, frame_height)
 
 
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
