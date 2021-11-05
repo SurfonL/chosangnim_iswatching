@@ -37,6 +37,8 @@ class VideoProcessor:
 
         frame = ShoulderP.draw_circle(frame, frame_coordinates, frame_width, frame_height)
 
+        frame=frame*0.1
+
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 
