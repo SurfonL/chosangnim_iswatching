@@ -35,9 +35,7 @@ class VideoProcessor:
         # Extract coordinates for frame
         frame_coordinates = helpers.extract_coordinates(batch_outputs[0, ...], frame_width, frame_height, real_time=True)
 
-        frame = cv2.line(frame, 1)
         frame = ShoulderP.draw_circle(frame, frame_coordinates, frame_width, frame_height)
-
 
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
