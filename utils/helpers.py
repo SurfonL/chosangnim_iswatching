@@ -4,8 +4,8 @@ from tensorflow.keras.backend import sigmoid, constant
 from tensorflow.keras.initializers import Initializer
 import numpy as np
 import math
-from skimage.transform import rescale
-from skimage.util import pad as padding
+# from skimage.transform import rescale
+# from skimage.util import pad as padding
 # from scipy.ndimage.filters import gaussian_filter
 
 class Swish(Activation):
