@@ -19,8 +19,8 @@ class VideoProcessor:
         #batch인데 어차피 1임
         batch = [frame[...,::-1]]
 
-        framework_name = 'tflite'
-        model_name = 'I_lite'
+        framework_name = 'tensorflow'
+        model_name = 'II'
         framework = framework_name.lower()
         model_variant = model_name.lower()
         lite = True if model_variant.endswith('_lite') else False
