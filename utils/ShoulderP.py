@@ -75,7 +75,7 @@ class ShoulderP:
         return ud
 
     @classmethod
-    def draw_circle(cls, frame, coordinates, frame_height, frame_width):
+    def draw_circle(cls, frame, coordinates,frame_height, frame_width):
         import cv2
         _, right_wrist_x, right_wrist_y = coordinates[4]
         _, left_wrist_x, left_wrist_y = coordinates[8]

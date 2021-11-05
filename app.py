@@ -33,11 +33,9 @@ class VideoProcessor:
         batch_outputs = self.infer(batch, model, lite, framework)
 
         # Extract coordinates for frame
-        frame_coordinates = helpers.extract_coordinates(batch_outputs[0, ...], frame_width, frame_height, real_time=True)
+        frame_coordinates = helpers.extract_coordinates(batch_outputs[0, ...], frame_height, frame_width, real_time=True)
 
-        frame = ShoulderP.draw_circle(frame, frame_coordinates, frame_width, frame_height)
-
-        frame=frame*0.1
+        frame = ShoulderP.draw_circle(frame, frame_coordinates, frame_height, frame_width)
 
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
