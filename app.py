@@ -143,4 +143,5 @@ class VideoProcessor:
         return batch_outputs
 
 
-webrtc_streamer(key="example", video_processor_factory=VideoProcessor)
+webrtc_streamer(key="example", video_processor_factory=VideoProcessor, media_stream_constraints={
+            "video": {"frameRate": {"ideal": 5}},},)
