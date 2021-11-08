@@ -12,6 +12,12 @@ import time
 
 
 class VideoProcessor:
+    def __init__(self):
+        self.framework_name = 'tensorflow'
+        self.model_name = 'II'
+        self.framework = self.framework_name.lower()
+        self.model_variant = self.model_name.lower()
+        self.model, self.resolution = self.get_model(self.framework, self.model_variant)
     def recv(self, frame):
         start = time.time()
 
@@ -19,25 +25,19 @@ class VideoProcessor:
         frame = frame.to_ndarray(format="bgr24")
 
         #batch인데 어차피 1임
-        # batch = [frame[...,::-1]]
-        #
-        # framework_name = 'tensorflow'
-        # model_name = 'II'
-        # framework = framework_name.lower()
-        # model_variant = model_name.lower()
-        # lite = True if model_variant.endswith('_lite') else False
-        # frame_height, frame_width = frame.shape[:2]
-        #
-        # model, resolution = self.get_model(framework, model_variant)
-        #
-        # # Preprocess batch
-        # batch = helpers.preprocess(batch, resolution, lite)
-        # batch_outputs = self.infer(batch, model, lite, framework)
-        #
-        # # Extract coordinates for frame
-        # frame_coordinates = helpers.extract_coordinates(batch_outputs[0, ...], frame_height, frame_width, real_time=True)
+        batch = [frame[...,::-1]]
 
-        # frame = ShoulderP.draw_circle(frame, frame_coordinates, frame_height, frame_width)
+        lite = True if self.model_variant.endswith('_lite') else False
+        frame_height, frame_width = frame.shape[:2]
+
+        # Preprocess batch
+        batch = helpers.preprocess(batch, self.resolution, lite)
+        batch_outputs = self.infer(batch, self.model, lite, self.framework)
+
+        # Extract coordinates for frame
+        frame_coordinates = helpers.extract_coordinates(batch_outputs[0, ...], frame_height, frame_width, real_time=True)
+
+        frame = ShoulderP.draw_circle(frame, frame_coordinates, frame_height, frame_width)
 
         print('takes', time.time()-start)
 
