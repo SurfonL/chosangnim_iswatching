@@ -4,6 +4,7 @@ import av
 from utils.ShoulderP import ShoulderP
 from os.path import join, normpath
 from utils import helpers
+import time
 
 
 #resolution
@@ -12,6 +13,7 @@ from utils import helpers
 
 class VideoProcessor:
     def recv(self, frame):
+        start = time.time()
 
         #(480 640 3)
         frame = frame.to_ndarray(format="bgr24")
@@ -36,6 +38,8 @@ class VideoProcessor:
         frame_coordinates = helpers.extract_coordinates(batch_outputs[0, ...], frame_height, frame_width, real_time=True)
 
         frame = ShoulderP.draw_circle(frame, frame_coordinates, frame_height, frame_width)
+
+        print('takes', time.time()-start)
 
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
@@ -143,5 +147,6 @@ class VideoProcessor:
         return batch_outputs
 
 
-webrtc_streamer(key="example", video_processor_factory=VideoProcessor, media_stream_constraints={
-            "video": {"frameRate": {"ideal": 5}},},)
+webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
+                media_stream_constraints={"video": {"frameRate": {"ideal": 5}}},
+                video_html_attrs={"style": {"width": "50%", "margin": "0 auto", "border": "5px yellow solid"},"controls": True,"autoPlay": True})
