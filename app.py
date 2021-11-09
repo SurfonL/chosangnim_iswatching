@@ -148,5 +148,4 @@ class VideoProcessor:
 
 
 webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
-                media_stream_constraints={"video": {"frameRate": {"ideal": 5}}},
-                video_html_attrs={"style": {"width": "50%", "margin": "0 auto", "border": "5px yellow solid"},"controls": True,"autoPlay": True})
+                media_stream_constraints={"video": {"frameRate": {"ideal": 30}}})
