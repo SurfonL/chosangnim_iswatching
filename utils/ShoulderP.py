@@ -87,7 +87,7 @@ class ShoulderP:
         if cls.rate_l > 0 and cls.rate_r > 0:
             frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
             frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
-            frame = cv2.resize(cv2.flip(frame, 1), (1000, 1000))
+            frame = cv2.flip(frame, 1)
         else:
             if cls.rate_r > -1 and cls.rate_l > -1:
                 frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_r), 1)
@@ -95,7 +95,7 @@ class ShoulderP:
             else:
                 frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
                 frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
-            frame = cv2.resize(cv2.flip(frame, 1), (1000, 1000))
+            frame = cv2.flip(frame, 1)
         return frame
 
 
