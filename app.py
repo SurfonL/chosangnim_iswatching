@@ -6,10 +6,10 @@ import time
 
 class VideoProcessor:
     def __init__(self):
-        self.framework = 'tflite'
-        self.model_variant = 'rt_lite'
-        # self.framework = 'tensorflow'
-        # self.model_variant = 'ii'
+        # self.framework = 'tflite'
+        # self.model_variant = 'rt_lite'
+        self.framework = 'tensorflow'
+        self.model_variant = 'ii'
         self.model, self.resolution = my_helpers.get_model(self.framework, self.model_variant)
     def recv(self, frame):
         start = time.time()

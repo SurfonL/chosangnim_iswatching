@@ -2,6 +2,9 @@ import numpy as np
 import cv2
 
 
+pos = {'head_top': 0, 'upper_neck': 1, 'right_shoulder' : 2, 'right_elbow' : 3,'right_wrist' : 4, 'thorax' : 5,
+            'left_shoulder' : 6,'left_elbow' : 7,'left_wrist' : 8,'pelvis' : 9,'right_hip' : 10,'right_knee' : 11,
+            'right_ankle' : 12, 'left_hip' : 13, 'left_knee' : 14, 'left_ankle' : 15 }
 class ShoulderP:
     times = 0
     rate_r = 0
@@ -10,35 +13,18 @@ class ShoulderP:
     state = False
 
     @classmethod
-    def sp_count(cls, frame_coordinates, old_sp_state):
-        head_top = 0
-        upper_neck = 1
-        right_shoulder = 2
-        right_elbow = 3
-        right_wrist = 4
-        thorax = 5
-        left_shoulder = 6
-        left_elbow = 7
-        left_wrist = 8
-        pelvis = 9
-        right_hip = 10
-        right_knee = 11
-        right_ankle = 12
-        left_hip = 13
-        left_knee = 14
-        left_ankle = 15
-
+    def sp_count(cls, f_coord, old_sp_state):
         # [x_coord,y_coord]
-        wrist_r = frame_coordinates[right_wrist][1:]
-        elbow_r = frame_coordinates[right_elbow][1:]
-        shoulder_r = frame_coordinates[right_shoulder][1:]
+        wrist_r = f_coord[pos['right_wrist']][1:]
+        elbow_r = f_coord[pos['right_elbow']][1:]
+        shoulder_r = f_coord[pos['right_shoulder']][1:]
 
-        wrist_l = frame_coordinates[left_wrist][1:]
-        elbow_l = frame_coordinates[left_elbow][1:]
-        shoulder_l = frame_coordinates[left_shoulder][1:]
+        wrist_l = f_coord[pos['left_wrist']][1:]
+        elbow_l = f_coord[pos['left_elbow']][1:]
+        shoulder_l = f_coord[pos['left_shoulder']][1:]
 
         #head_top = ('headtop',x_co,y_co)
-        threshold = (frame_coordinates[head_top][2] + frame_coordinates[upper_neck][2]) / 2
+        threshold = (f_coord[pos['head_top']][2] + f_coord[pos['upper_neck']][2]) / 2
 
         # boolean. define the position of each arm. True => up, False => down
         arm_r = cls.ud_state(wrist_r, elbow_r, threshold)
@@ -78,24 +64,26 @@ class ShoulderP:
         return ud
 
     @classmethod
-    def draw_circle(cls, frame, coordinates,frame_width, frame_height):
-        _, right_wrist_x, right_wrist_y = coordinates[4]
-        _, left_wrist_x, left_wrist_y = coordinates[8]
+    def draw_circle(cls, frame, f_coord, frame_width, frame_height):
+        _, right_wrist_x, right_wrist_y = f_coord[pos['right_wrist']]
+        _, left_wrist_x, left_wrist_y = f_coord[pos['left_wrist']]
         right_wrist_x *= frame_width
         right_wrist_y *= frame_height
         left_wrist_x *= frame_width
         left_wrist_y *= frame_height
 
+        lw, le, rw, re = cls.validity(f_coord)
+
         if cls.rate_l > 0 and cls.rate_r > 0:
-            frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
-            frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
+            if rw: frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
+            if lw: frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
         else:
             if cls.rate_r > -1 and cls.rate_l > -1:
-                frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_r), 1)
-                frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_l), 1)
+                if rw: frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_r), 1)
+                if lw: frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_l), 1)
             else:
-                frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
-                frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
+                if rw: frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
+                if lw: frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
         return frame
 
 
@@ -158,12 +146,23 @@ class ShoulderP:
         # blended = cv2.resize(cv2.flip(blended, 1), (1000, 1000))
         # return cv2.imshow('EfficientPose (Groos et al., 2020)', blended)
 
+    @staticmethod
+    def validity(f_coord):
+        lw= f_coord[pos['left_wrist']][1] >0
+        le= f_coord[pos['left_elbow']][1] >0
+        rw= f_coord[pos['right_wrist']][1] >0
+        re= f_coord[pos['right_elbow']][1] >0
+        return (lw,le,rw,re)
+
+
     @classmethod
-    def run_shoulderp(cls,frame,frame_coordinates,frame_width,frame_height):
+    def run_shoulderp(cls, frame, f_coord, frame_width, frame_height):
+        val = cls.validity(f_coord)
+        if all(val):
+            cls.state = cls.sp_count(f_coord, cls.state)
+        else:
+            print('not valid')
         text = "Counts : " + str(cls.times)
         frame = cv2.putText(frame, text, (0, 100), cls.font, 1, (255, 255, 255), 2)
-
-        frame = cls.draw_circle(frame, frame_coordinates, frame_width, frame_height)
-        cls.state = cls.sp_count(frame_coordinates, cls.state)
-
+        frame = cls.draw_circle(frame, f_coord, frame_width, frame_height)
         return frame
