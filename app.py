@@ -36,12 +36,16 @@ def run():
     st.title('조상님이 보고있다')
     mode = st.selectbox("", ['Shoulder Press', "Squats"])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
-                    media_stream_constraints={"video": {"frameRate": {"ideal": 20}}},mode=WebRtcMode.SENDRECV)
+                    media_stream_constraints={"video": {"frameRate": {"ideal": 30}}})
     goal = st.select_slider('How many?', [i for i in range(1, 21)])
     if ctx.video_processor:
         ctx.video_processor.goal = goal
         ctx.video_processor.mode = mode
 
-
-
 run()
+
+#todo: statistic table
+#record sets and time automatically
+#reset button
+#자세 교정
+#집중물어

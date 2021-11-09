@@ -270,4 +270,4 @@ def std_process(frame, model_variant, model, resolution,framework):
     frame_coordinates = extract_coordinates(batch_outputs[0, ...], frame_width, frame_height,
                                                        real_time=True)
 
-    return frame, frame_coordinates, frame_width, frame_height
+    return frame, frame_coordinates, frame_height, frame_width

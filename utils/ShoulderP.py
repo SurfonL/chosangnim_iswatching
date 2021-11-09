@@ -64,7 +64,7 @@ class ShoulderP:
         return ud
 
     @classmethod
-    def draw_circle(cls, frame, f_coord, frame_width, frame_height):
+    def draw_circle(cls, frame, f_coord, frame_height, frame_width):
         _, right_wrist_x, right_wrist_y = f_coord[pos['right_wrist']]
         _, left_wrist_x, left_wrist_y = f_coord[pos['left_wrist']]
         right_wrist_x *= frame_width
@@ -156,7 +156,7 @@ class ShoulderP:
 
 
     @classmethod
-    def run_shoulderp(cls, frame, f_coord, frame_width, frame_height):
+    def run_shoulderp(cls, frame, f_coord, frame_height, frame_width):
         val = cls.validity(f_coord)
         if all(val):
             cls.state = cls.sp_count(f_coord, cls.state)
@@ -165,5 +165,5 @@ class ShoulderP:
             pass
         text = "Counts : " + str(cls.times)
         frame = cv2.putText(frame, text, (0, 100), cls.font, 1, (255, 255, 255), 2)
-        frame = cls.draw_circle(frame, f_coord, frame_width, frame_height)
+        frame = cls.draw_circle(frame, f_coord, frame_height, frame_width)
         return frame
