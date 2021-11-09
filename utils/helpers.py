@@ -289,8 +289,6 @@ def extract_coordinates(frame_output, frame_height, frame_width, real_time=False
 
         # Find peak point
         conf = frame_output[...,i]
-        if not real_time:
-            conf = gaussian_filter(conf, sigma=1.) 
         max_index = np.argmax(conf)
         peak_y = float(math.floor(max_index / output_width))
         peak_x = max_index % output_width

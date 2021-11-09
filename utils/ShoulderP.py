@@ -1,10 +1,13 @@
 import numpy as np
+import cv2
 
 
 class ShoulderP:
     times = 0
     rate_r = 0
     rate_l = 0
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    state = False
 
     @classmethod
     def sp_count(cls, frame_coordinates, old_sp_state):
@@ -75,8 +78,7 @@ class ShoulderP:
         return ud
 
     @classmethod
-    def draw_circle(cls, frame, coordinates,frame_height, frame_width):
-        import cv2
+    def draw_circle(cls, frame, coordinates,frame_width, frame_height):
         _, right_wrist_x, right_wrist_y = coordinates[4]
         _, left_wrist_x, left_wrist_y = coordinates[8]
         right_wrist_x *= frame_width
@@ -87,7 +89,6 @@ class ShoulderP:
         if cls.rate_l > 0 and cls.rate_r > 0:
             frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
             frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
-            frame = cv2.flip(frame, 1)
         else:
             if cls.rate_r > -1 and cls.rate_l > -1:
                 frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_r), 1)
@@ -95,7 +96,6 @@ class ShoulderP:
             else:
                 frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
                 frame = cls.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
-            frame = cv2.flip(frame, 1)
         return frame
 
 
@@ -139,8 +139,6 @@ class ShoulderP:
             Returns: Image with circle
 
             '''
-        import cv2
-        import numpy as np
 
         image_ = cv2.circle(frame, (int(body_part_x), int(body_part_y)), marker_radius, (255, 255, 255), 2)
         if fill:
@@ -159,3 +157,13 @@ class ShoulderP:
         #
         # blended = cv2.resize(cv2.flip(blended, 1), (1000, 1000))
         # return cv2.imshow('EfficientPose (Groos et al., 2020)', blended)
+
+    @classmethod
+    def run_shoulderp(cls,frame,frame_coordinates,frame_width,frame_height):
+        text = "Counts : " + str(cls.times)
+        frame = cv2.putText(frame, text, (0, 100), cls.font, 1, (255, 255, 255), 2)
+
+        frame = cls.draw_circle(frame, frame_coordinates, frame_width, frame_height)
+        cls.state = cls.sp_count(frame_coordinates, cls.state)
+
+        return frame
