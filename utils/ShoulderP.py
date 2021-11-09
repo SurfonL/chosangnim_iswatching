@@ -161,7 +161,8 @@ class ShoulderP:
         if all(val):
             cls.state = cls.sp_count(f_coord, cls.state)
         else:
-            print('not valid')
+            # print('not valid')
+            pass
         text = "Counts : " + str(cls.times)
         frame = cv2.putText(frame, text, (0, 100), cls.font, 1, (255, 255, 255), 2)
         frame = cls.draw_circle(frame, f_coord, frame_width, frame_height)
