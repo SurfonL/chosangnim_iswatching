@@ -259,7 +259,7 @@ def std_process(frame, model_variant, model, resolution,framework):
     # (480 640 3)
     frame = frame.to_ndarray(format="bgr24")
     # batch인데 어차피 1임
-    frame = frame[:,::-1]
+    frame = cv2.flip(frame,1)
     batch = [frame[..., ::-1]]
     lite = True if model_variant.endswith('_lite') else False
     frame_height, frame_width = frame.shape[:2]
