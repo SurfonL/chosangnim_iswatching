@@ -257,7 +257,7 @@ def extract_coordinates(frame_output, frame_width, frame_height,  real_time=Fals
 
 def std_process(frame, model_variant, model, resolution,framework):
     # (480 640 3)
-    frame = frame.to_ndarray(format="bgr24")
+    frame = frame.to_ndarray(width= 1920, height = 1080, format="bgr24")
     # batch인데 어차피 1임
     frame = cv2.flip(frame,1)
     batch = [frame[..., ::-1]]

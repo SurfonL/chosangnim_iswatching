@@ -10,10 +10,10 @@ import streamlit as st
 
 class VideoProcessor:
     def __init__(self):
-        # self.framework = 'tflite'
-        # self.model_variant = 'rt_lite'
-        self.framework = 'tensorflow'
-        self.model_variant = 'ii'
+        self.framework = 'tflite'
+        self.model_variant = 'rt_lite'
+        # self.framework = 'tensorflow'
+        # self.model_variant = 'ii'
         self.model, self.resolution = my_helpers.get_model(self.framework, self.model_variant)
 
         self.goal = 0
@@ -25,6 +25,8 @@ class VideoProcessor:
         frame, frame_coordinates, frame_height,frame_width = \
             my_helpers.std_process(frame,self.model_variant, self.model, self.resolution,self.framework)
 
+        print(frame.shape, 'after')
+
         if self.mode == 'Shoulder Press':
             frame = ShoulderP.run_shoulderp(frame, frame_coordinates, frame_height, frame_width)
         elif self.mode == "Squats":
@@ -34,7 +36,7 @@ class VideoProcessor:
 
 def run():
     st.title('조상님이 보고있다')
-    mode = st.selectbox("", ['Shoulder Press', "Squats"])
+    mode = st.sidebar.selectbox("", ['Shoulder Press', "Squats"])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
                     media_stream_constraints={"video": {"frameRate": {"ideal": 30}}})
     goal = st.select_slider('How many?', [i for i in range(1, 21)])
