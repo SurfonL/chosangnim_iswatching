@@ -6,39 +6,36 @@ from utils import my_helpers
 import time
 import streamlit as st
 
+import mediapipe as mp
+
 
 
 class VideoProcessor:
     def __init__(self):
-        self.framework = 'tflite'
-        self.model_variant = 'rt_lite'
-        # self.framework = 'tensorflow'
-        # self.model_variant = 'ii'
-        self.model, self.resolution = my_helpers.get_model(self.framework, self.model_variant)
+        self.mp_pose = mp.solutions.pose
+        self.pose = self.mp_pose.Pose()
 
         self.goal = 0
         self.mode = ""
 
     def recv(self, frame):
         start = time.time()
+        frame = frame.to_ndarray(width=1920, height=1080, format="bgr24")
+        # frame = frame.to_ndarray(format="bgr24")
+        results = self.pose.process(frame)
+        if results.pose_landmarks is not None:
+            frame = ShoulderP.draw_landmarks(frame,results.pose_landmarks)
 
-        frame, frame_coordinates, frame_height,frame_width = \
-            my_helpers.std_process(frame,self.model_variant, self.model, self.resolution,self.framework)
-
-        print(frame.shape, 'after')
-
-        if self.mode == 'Shoulder Press':
-            frame = ShoulderP.run_shoulderp(frame, frame_coordinates, frame_height, frame_width)
-        elif self.mode == "Squats":
-            pass
-        # print('takes', time.time()-start)
+        print('takes', time.time()-start)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
+
+
 
 def run():
     st.title('조상님이 보고있다')
     mode = st.sidebar.selectbox("", ['Shoulder Press', "Squats"])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
-                    media_stream_constraints={"video": {"frameRate": {"ideal": 30}}})
+                    media_stream_constraints={"video": {"frameRate": {"ideal": 10}}})
     goal = st.select_slider('How many?', [i for i in range(1, 21)])
     if ctx.video_processor:
         ctx.video_processor.goal = goal
