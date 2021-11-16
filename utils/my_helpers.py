@@ -1,9 +1,9 @@
 import cv2
 
 
-def std_process(frame, pose):
+def std_process(frame, pose, width = None, height = None):
     # (480 640 3)
-    frame = frame.to_ndarray(width= 720, height = 480, format="bgr24")
+    frame = frame.to_ndarray(width= width, height = height, format="bgr24")
     # batch인데 어차피 1임
     frame = cv2.flip(frame,1)
     results = pose.process(frame)

@@ -13,18 +13,18 @@ class ShoulderP:
     state = False
 
     @classmethod
-    def sp_count(cls, f_coord, old_sp_state):
+    def sp_count(cls, landmark, old_sp_state):
         # [x_coord,y_coord]
-        wrist_r = f_coord[pos['right_wrist']]
-        elbow_r = f_coord[pos['right_elbow']]
-        shoulder_r = f_coord[pos['right_shoulder']]
+        wrist_r = landmark[pos['right_wrist']]
+        elbow_r = landmark[pos['right_elbow']]
+        shoulder_r = landmark[pos['right_shoulder']]
 
-        wrist_l = f_coord[pos['left_wrist']]
-        elbow_l = f_coord[pos['left_elbow']]
-        shoulder_l = f_coord[pos['left_shoulder']]
+        wrist_l = landmark[pos['left_wrist']]
+        elbow_l = landmark[pos['left_elbow']]
+        shoulder_l = landmark[pos['left_shoulder']]
 
         #head_top = ('headtop',x_co,y_co)
-        threshold = f_coord['nose'].y
+        threshold = landmark[pos['nose']].y
 
         # boolean. define the position of each arm. True => up, False => down
         arm_r = cls.ud_state(wrist_r, elbow_r, threshold)
@@ -158,6 +158,12 @@ class ShoulderP:
     @classmethod
     def run_shoulderp(cls, frame, landmarks):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
+
+        val = cls.validity(landmarks.landmark)
+        if all(val):
+            cls.state = cls.sp_count(landmarks.landmark, cls.state)
+        else:
+            pass
 
         text = "Counts : " + str(cls.times)
         frame = cv2.putText(frame, text, (0, 100), cls.font, 1, (255, 255, 255), 2)
