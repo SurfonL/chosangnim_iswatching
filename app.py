@@ -13,6 +13,7 @@ import mediapipe as mp
 class VideoProcessor:
     def __init__(self):
         self.pose = mp.solutions.pose.Pose(model_complexity=1)
+        # self.State = my_helpers.PoseState(buffer_size)
 
         self.goal = 0
         self.mode = ""
@@ -21,7 +22,31 @@ class VideoProcessor:
         start = time.time()
         frame, landmarks = my_helpers.std_process(frame,self.pose, width= None, height= None)
         if landmarks is not None:
-            frame = ShoulderP.run_shoulderp(frame,landmarks)
+            #frame_pos = knn classifier
+
+            #pos_state = self.State.pos_state(frame_pos)
+                #append to deque -> most_common -> return most common state
+
+
+            #TODO: record workout, rest time
+
+            #if pos state = shoulderp_down
+                frame = ShoulderP.run_shoulderp(frame,landmarks)
+                    #also draw what pose it is
+            #if pos_stae = squat_down
+                #frame = Squat.run_squat
+                    # also draw what pose it is
+            #if pos_state = bench_ up or bench down
+                # frame = BenchP.run_benchp(pos_state, landmarks)
+                #     pos state down then up => count
+                #     draw
+            #if pose_state = dead_up or bench down
+                #   frame = Dead.run_dead(pos_state, landmarks)
+                #     pos state down then up => count
+                #     draw
+
+
+
 
 
 
@@ -32,6 +57,7 @@ class VideoProcessor:
 
 def run():
     st.title('조상님이 보고있다')
+    #subtitle(4대운동 - 스쿼트 - 벤치 - 데드리프트 - 숄더프레스 보조)
     mode = st.sidebar.selectbox("", ['Shoulder Press', "Squats"])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
                     media_stream_constraints={"video": {"frameRate": {"ideal": 10}}})
@@ -39,6 +65,10 @@ def run():
     if ctx.video_processor:
         ctx.video_processor.goal = goal
         ctx.video_processor.mode = mode
+
+    #add columns - workout time, count, rest time
+    #reset column
+    #delete columns
 
 run()
 
