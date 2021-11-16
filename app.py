@@ -12,21 +12,20 @@ import mediapipe as mp
 
 class VideoProcessor:
     def __init__(self):
-        self.mp_pose = mp.solutions.pose
-        self.pose = self.mp_pose.Pose()
+        self.pose = mp.solutions.pose.Pose()
 
         self.goal = 0
         self.mode = ""
 
     def recv(self, frame):
         start = time.time()
-        frame = frame.to_ndarray(width=1920, height=1080, format="bgr24")
-        # frame = frame.to_ndarray(format="bgr24")
-        results = self.pose.process(frame)
-        if results.pose_landmarks is not None:
-            frame = ShoulderP.draw_landmarks(frame,results.pose_landmarks)
+        frame, landmarks = my_helpers.std_process(frame,self.pose)
+        if landmarks is not None:
+            frame = ShoulderP.run_shoulderp(frame,landmarks)
 
-        print('takes', time.time()-start)
+
+
+        # print('takes', time.time()-start)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 

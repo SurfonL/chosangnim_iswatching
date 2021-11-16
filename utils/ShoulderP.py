@@ -2,9 +2,9 @@ import numpy as np
 import cv2
 
 
-pos = {'head_top': 0, 'upper_neck': 1, 'right_shoulder' : 2, 'right_elbow' : 3,'right_wrist' : 4, 'thorax' : 5,
-            'left_shoulder' : 6,'left_elbow' : 7,'left_wrist' : 8,'pelvis' : 9,'right_hip' : 10,'right_knee' : 11,
-            'right_ankle' : 12, 'left_hip' : 13, 'left_knee' : 14, 'left_ankle' : 15 }
+pos = {'nose': 0, 'right_shoulder' : 11, 'right_elbow' : 13,'right_wrist' : 15,
+            'left_shoulder' : 12,'left_elbow' : 14,'left_wrist' : 16, 'right_hip' : 23,'right_knee' : 25,
+            'right_ankle' : 27, 'left_hip' : 24, 'left_knee' : 26, 'left_ankle' : 28 }
 class ShoulderP:
     times = 0
     rate_r = 0
@@ -15,16 +15,16 @@ class ShoulderP:
     @classmethod
     def sp_count(cls, f_coord, old_sp_state):
         # [x_coord,y_coord]
-        wrist_r = f_coord[pos['right_wrist']][1:]
-        elbow_r = f_coord[pos['right_elbow']][1:]
-        shoulder_r = f_coord[pos['right_shoulder']][1:]
+        wrist_r = f_coord[pos['right_wrist']]
+        elbow_r = f_coord[pos['right_elbow']]
+        shoulder_r = f_coord[pos['right_shoulder']]
 
-        wrist_l = f_coord[pos['left_wrist']][1:]
-        elbow_l = f_coord[pos['left_elbow']][1:]
-        shoulder_l = f_coord[pos['left_shoulder']][1:]
+        wrist_l = f_coord[pos['left_wrist']]
+        elbow_l = f_coord[pos['left_elbow']]
+        shoulder_l = f_coord[pos['left_shoulder']]
 
         #head_top = ('headtop',x_co,y_co)
-        threshold = (f_coord[pos['head_top']][2] + f_coord[pos['upper_neck']][2]) / 2
+        threshold = f_coord['nose'].y
 
         # boolean. define the position of each arm. True => up, False => down
         arm_r = cls.ud_state(wrist_r, elbow_r, threshold)
@@ -42,8 +42,8 @@ class ShoulderP:
         else:
             pass
 
-        propor_r = np.linalg.norm([wrist_r[0]-elbow_r[0],wrist_r[1]-elbow_r[1]])
-        propor_l = np.linalg.norm([wrist_l[0]-elbow_l[0],wrist_l[1]-elbow_l[1]])
+        propor_r = np.linalg.norm([wrist_r.x-elbow_r.x,wrist_r.y-elbow_r.y])
+        propor_l = np.linalg.norm([wrist_l.x-elbow_l.x,wrist_l.y-elbow_l.y])
 
         # if in up-state, poi is rate towards down
         # if ud:
@@ -56,23 +56,23 @@ class ShoulderP:
         #     cls.rate_r = (threshold - elbow_r[1]) / propor_r
         #     cls.rate_l = (threshold - elbow_l[1]) / propor_l
         if propor_r > 0.1 and propor_l > 0.1:
-            cls.rate_r = (threshold - elbow_r[1]) / propor_r
-            cls.rate_l = (threshold - elbow_l[1]) / propor_l
+            cls.rate_r = (threshold - elbow_r.y) / propor_r
+            cls.rate_l = (threshold - elbow_l.y) / propor_l
         else:
             pass
 
         return ud
 
     @classmethod
-    def draw_circle(cls, frame, f_coord, frame_height, frame_width):
-        _, right_wrist_x, right_wrist_y = f_coord[pos['right_wrist']]
-        _, left_wrist_x, left_wrist_y = f_coord[pos['left_wrist']]
+    def draw_circle(cls, frame, landmark, frame_height, frame_width):
+        right_wrist_x, right_wrist_y = landmark[pos['right_wrist']].x, landmark[pos['right_wrist']].y
+        left_wrist_x, left_wrist_y = landmark[pos['left_wrist']].x, landmark[pos['left_wrist']].y
         right_wrist_x *= frame_width
         right_wrist_y *= frame_height
         left_wrist_x *= frame_width
         left_wrist_y *= frame_height
 
-        lw, le, rw, re = cls.validity(f_coord)
+        lw, le, rw, re = cls.validity(landmark)
 
         if cls.rate_l > 0 and cls.rate_r > 0:
             if rw: frame = cls.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
@@ -104,8 +104,8 @@ class ShoulderP:
 
     @staticmethod
     def ud_state(wrist_coord, elbow_coord, threshold):
-        elbow_y = elbow_coord[1]
-        wrist_y = wrist_coord[1]
+        elbow_y = elbow_coord.y
+        wrist_y = wrist_coord.y
         # up state
         if elbow_y <= threshold:
             return True
@@ -147,25 +147,24 @@ class ShoulderP:
         # return cv2.imshow('EfficientPose (Groos et al., 2020)', blended)
 
     @staticmethod
-    def validity(f_coord):
-        lw= f_coord[pos['left_wrist']][1] >0
-        le= f_coord[pos['left_elbow']][1] >0
-        rw= f_coord[pos['right_wrist']][1] >0
-        re= f_coord[pos['right_elbow']][1] >0
+    def validity(landmark):
+        lw= landmark[pos['left_wrist']].visibility >0.8
+        le= landmark[pos['left_elbow']].visibility >0.8
+        rw= landmark[pos['right_wrist']].visibility >0.8
+        re= landmark[pos['right_elbow']].visibility >0.8
         return (lw,le,rw,re)
 
 
     @classmethod
-    def run_shoulderp(cls, frame, f_coord, frame_height, frame_width):
-        val = cls.validity(f_coord)
-        if all(val):
-            cls.state = cls.sp_count(f_coord, cls.state)
-        else:
-            # print('not valid')
-            pass
+    def run_shoulderp(cls, frame, landmarks):
+        frame_height, frame_width = frame.shape[0], frame.shape[1]
+
         text = "Counts : " + str(cls.times)
         frame = cv2.putText(frame, text, (0, 100), cls.font, 1, (255, 255, 255), 2)
-        frame = cls.draw_circle(frame, f_coord, frame_height, frame_width)
+        frame = cls.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
+
+
+
         return frame
 
     def draw_landmarks(
@@ -179,7 +178,10 @@ class ShoulderP:
 
         landmark_point = []
 
+        print(landmarks.landmark[0])
+
         for index, landmark in enumerate(landmarks.landmark):
+
             landmark_x = min(int(landmark.x * image_width), image_width - 1)
             landmark_y = min(int(landmark.y * image_height), image_height - 1)
             landmark_z = landmark.z
