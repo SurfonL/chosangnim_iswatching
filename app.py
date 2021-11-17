@@ -1,22 +1,31 @@
 from streamlit_webrtc import webrtc_streamer, WebRtcMode
-
+import streamlit as st
+import mediapipe as mp
+import time
 import av
 from utils.ShoulderP import ShoulderP
 from utils import my_helpers
-import time
-import streamlit as st
 
-import mediapipe as mp
-
+from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 
 
 class VideoProcessor:
     def __init__(self):
-        self.pose = mp.solutions.pose.Pose(model_complexity=1)
+        self.pose = mp.solutions.pose.Pose(model_complexity=2)
         # self.State = my_helpers.PoseState(buffer_size)
 
         self.goal = 0
         self.mode = ""
+
+        self.pose_embedder = FullBodyPoseEmbedder()
+        self.pose_classifier = PoseClassifier(
+            pose_samples_folder='utils/fitness_poses_csvs_out',
+            pose_embedder=self.pose_embedder,
+            top_n_by_max_distance=30,
+            top_n_by_mean_distance=10)
+        self.pose_classification_filter = EMADictSmoothing(
+            window_size=10,
+            alpha=0.2)
 
     def recv(self, frame):
         start = time.time()
@@ -24,14 +33,15 @@ class VideoProcessor:
         if landmarks is not None:
             #frame_pos = knn classifier
 
-            #pos_state = self.State.pos_state(frame_pos)
+            pose_classification = self.pose_classifier(landmarks)
                 #append to deque -> most_common -> return most common state
+            pose_classification_filtered = self.pose_classification_filter(pose_classification)
 
 
             #TODO: record workout, rest time
 
             #if pos state = shoulderp_down
-                frame = ShoulderP.run_shoulderp(frame,landmarks)
+            frame = ShoulderP.run_shoulderp(frame,landmarks)
                     #also draw what pose it is
             #if pos_stae = squat_down
                 #frame = Squat.run_squat
@@ -47,10 +57,7 @@ class VideoProcessor:
 
 
 
-
-
-
-        print('takes', time.time()-start)
+        # print('takes', time.time()-start)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 
