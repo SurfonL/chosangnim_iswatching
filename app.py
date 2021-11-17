@@ -17,15 +17,15 @@ class VideoProcessor:
         self.goal = 0
         self.mode = ""
 
-        self.pose_embedder = FullBodyPoseEmbedder()
-        self.pose_classifier = PoseClassifier(
-            pose_samples_folder='utils/fitness_poses_csvs_out',
-            pose_embedder=self.pose_embedder,
-            top_n_by_max_distance=30,
-            top_n_by_mean_distance=10)
-        self.pose_classification_filter = EMADictSmoothing(
-            window_size=10,
-            alpha=0.2)
+        # self.pose_embedder = FullBodyPoseEmbedder()
+        # self.pose_classifier = PoseClassifier(
+        #     pose_samples_folder='utils/fitness_poses_csvs_out',
+        #     pose_embedder=self.pose_embedder,
+        #     top_n_by_max_distance=30,
+        #     top_n_by_mean_distance=10)
+        # self.pose_classification_filter = EMADictSmoothing(
+        #     window_size=10,
+        #     alpha=0.2)
 
     def recv(self, frame):
         start = time.time()
@@ -33,9 +33,9 @@ class VideoProcessor:
         if landmarks is not None:
             #frame_pos = knn classifier
 
-            pose_classification = self.pose_classifier(landmarks)
+            # pose_classification = self.pose_classifier(landmarks)
                 #append to deque -> most_common -> return most common state
-            pose_classification_filtered = self.pose_classification_filter(pose_classification)
+            # pose_classification_filtered = self.pose_classification_filter(pose_classification)
 
 
             #TODO: record workout, rest time
