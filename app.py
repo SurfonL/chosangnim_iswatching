@@ -32,6 +32,7 @@ class VideoProcessor:
             pose_predict = self.Stdp.pose_class(landmarks)
             pose_state = max(pose_predict,key=pose_predict.get)
             print(pose_state)
+            print(pose_predict)
 
             #TODO: record workout, rest time
             #if pos state = shoulderp_down
@@ -50,6 +51,7 @@ class VideoProcessor:
                 #     draw
 
         text = "Counts : " + str(self.count)
+        #TODO: frame 크기에 따라 바뀌는 text 사이즈
         frame = cv2.putText(frame, text, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
 
