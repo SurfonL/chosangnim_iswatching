@@ -1,47 +1,41 @@
 from streamlit_webrtc import webrtc_streamer, WebRtcMode
 import streamlit as st
-import mediapipe as mp
+
+import cv2
 import time
 import av
 from utils.ShoulderP import ShoulderP
-from utils import my_helpers
+from utils.my_helpers import StandardProcess
+import numpy as np
+frame = 15
 
-from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 
-
+#TODO: test av_size, av_alpha, framewidth+height
 class VideoProcessor:
     def __init__(self):
-        self.pose = mp.solutions.pose.Pose(model_complexity=2)
-        # self.State = my_helpers.PoseState(buffer_size)
 
+        self.Stdp = StandardProcess(
+            model_complexity = 0,
+            av_size = 60,
+            av_alpha = 0.4
+        )
+        self.count = 0
         self.goal = 0
         self.mode = ""
 
-        # self.pose_embedder = FullBodyPoseEmbedder()
-        # self.pose_classifier = PoseClassifier(
-        #     pose_samples_folder='utils/fitness_poses_csvs_out',
-        #     pose_embedder=self.pose_embedder,
-        #     top_n_by_max_distance=30,
-        #     top_n_by_mean_distance=10)
-        # self.pose_classification_filter = EMADictSmoothing(
-        #     window_size=10,
-        #     alpha=0.2)
+
 
     def recv(self, frame):
         start = time.time()
-        frame, landmarks = my_helpers.std_process(frame,self.pose, width= None, height= None)
+        frame, landmarks = self.Stdp.std_process(frame, width= None, height= None)
         if landmarks is not None:
-            #frame_pos = knn classifier
-
-            # pose_classification = self.pose_classifier(landmarks)
-                #append to deque -> most_common -> return most common state
-            # pose_classification_filtered = self.pose_classification_filter(pose_classification)
-
+            pose_predict = self.Stdp.pose_class(landmarks)
+            pose_state = max(pose_predict,key=pose_predict.get)
+            print(pose_state)
 
             #TODO: record workout, rest time
-
             #if pos state = shoulderp_down
-            frame = ShoulderP.run_shoulderp(frame,landmarks)
+            frame, self.count = ShoulderP.run_shoulderp(frame,landmarks)
                     #also draw what pose it is
             #if pos_stae = squat_down
                 #frame = Squat.run_squat
@@ -55,6 +49,9 @@ class VideoProcessor:
                 #     pos state down then up => count
                 #     draw
 
+        text = "Counts : " + str(self.count)
+        frame = cv2.putText(frame, text, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
 
 
         # print('takes', time.time()-start)
@@ -65,13 +62,13 @@ class VideoProcessor:
 def run():
     st.title('조상님이 보고있다')
     #subtitle(4대운동 - 스쿼트 - 벤치 - 데드리프트 - 숄더프레스 보조)
-    mode = st.sidebar.selectbox("", ['Shoulder Press', "Squats"])
+    # mode = st.sidebar.selectbox("", ['Shoulder Press', "Squats"])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
-                    media_stream_constraints={"video": {"frameRate": {"ideal": 10}}})
+                    media_stream_constraints={"video": {"frameRate": {"ideal": frame}}})
     goal = st.select_slider('How many?', [i for i in range(1, 21)])
     if ctx.video_processor:
         ctx.video_processor.goal = goal
-        ctx.video_processor.mode = mode
+        ctx.video_processor.frame = frame
 
     #add columns - workout time, count, rest time
     #reset column

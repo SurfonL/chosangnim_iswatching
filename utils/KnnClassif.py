@@ -170,6 +170,9 @@ class PoseClassifier(object):
             }
         """
         # Check that provided and target poses have the same shape.
+
+
+
         assert pose_landmarks.shape == (self._n_landmarks, self._n_dimensions), 'Unexpected shape: {}'.format(
             pose_landmarks.shape)
 

@@ -165,13 +165,10 @@ class ShoulderP:
         else:
             pass
 
-        text = "Counts : " + str(cls.times)
-        frame = cv2.putText(frame, text, (0, 100), cls.font, 1, (255, 255, 255), 2)
+
         frame = cls.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
 
-
-
-        return frame
+        return frame, cls.times
 
     def draw_landmarks(
             image,
