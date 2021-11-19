@@ -1,3 +1,5 @@
+import pandas as pd
+
 from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 import mediapipe as mp
 import cv2
@@ -41,9 +43,9 @@ class StandardProcess:
 def print_count(frame,height,width,count, goal, pose):
     if goal != 0:
         count = goal-count
-        text = str(count) + " More"
+        text = str(count) + " to go"
     else:
-        text = "Counts: " + str(count)
+        text = "Count: " + str(count)
     f_size = height / 200
     f_thick = int(f_size * 1.5)
     t_size, t_y = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
@@ -57,3 +59,9 @@ def print_count(frame,height,width,count, goal, pose):
                         cv2.FONT_HERSHEY_SIMPLEX, f_size, (255, 255, 255), f_thick)
 
     return frame
+
+def workout_row(set_no, pose, count, set_duration, rest_duration):
+    columns = ['pose', 'count','set duration', 'rest duration']
+    row = {'Set No: {}'.format(set_no): [pose, count, set_duration, rest_duration]}
+
+    return pd.DataFrame.from_dict(row, orient='index', columns = columns)
