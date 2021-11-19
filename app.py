@@ -5,7 +5,7 @@ import cv2
 import time
 import av
 from utils.ShoulderP import ShoulderP
-from utils.my_helpers import StandardProcess
+from utils.my_helpers import StandardProcess, print_count
 import numpy as np
 frame = 15
 
@@ -16,28 +16,32 @@ class VideoProcessor:
 
         self.Stdp = StandardProcess(
             model_complexity = 0,
-            av_size = 60,
-            av_alpha = 0.4
+            av_size = 100,
+            av_alpha = 0.01
         )
+        self.prev_pose_state = None
         self.count = 0
         self.goal = 0
-        self.mode = ""
-
 
 
     def recv(self, frame):
         start = time.time()
-        frame, landmarks = self.Stdp.std_process(frame, width= None, height= None)
+        frame, landmarks, height, width = self.Stdp.std_process(frame, width= None, height= None)
         if landmarks is not None:
             pose_predict = self.Stdp.pose_class(landmarks)
             pose_state = max(pose_predict,key=pose_predict.get)
-            print(pose_state)
-            print(pose_predict)
+            pose_prob = pose_predict[pose_state]
+            #if pose_prob < 6 then resting
 
             #TODO: record workout, rest time
             #if pos state = shoulderp_down
             frame, self.count = ShoulderP.run_shoulderp(frame,landmarks)
-                    #also draw what pose it is
+            pos = 'shoulder_p'
+            if self.prev_pose_state == 'resting':
+                ShoulderP.times = 0
+                self.count = 0
+                self.set_time = time.time()
+
             #if pos_stae = squat_down
                 #frame = Squat.run_squat
                     # also draw what pose it is
@@ -50,13 +54,20 @@ class VideoProcessor:
                 #     pos state down then up => count
                 #     draw
 
-        text = "Counts : " + str(self.count)
-        #TODO: frame 크기에 따라 바뀌는 text 사이즈
-        frame = cv2.putText(frame, text, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            if pose_state == 'resting' and self.prev_pose_state != 'resting':
+                pass
 
+
+
+            self.prev_pose_state = pose_state
+        else:
+            pose_state = None
 
 
         # print('takes', time.time()-start)
+
+        pos = pose_state
+        frame = print_count(frame, height, width, self.count, self.goal, str(pos))
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 
@@ -64,13 +75,14 @@ class VideoProcessor:
 def run():
     st.title('조상님이 보고있다')
     #subtitle(4대운동 - 스쿼트 - 벤치 - 데드리프트 - 숄더프레스 보조)
-    # mode = st.sidebar.selectbox("", ['Shoulder Press', "Squats"])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
                     media_stream_constraints={"video": {"frameRate": {"ideal": frame}}})
-    goal = st.select_slider('How many?', [i for i in range(1, 21)])
+    goal = st.select_slider('How many?', [i for i in range(0, 21)])
     if ctx.video_processor:
         ctx.video_processor.goal = goal
-        ctx.video_processor.frame = frame
+        value = ctx.video_processor.count
+        print(value)
+        st.write(value)
 
     #add columns - workout time, count, rest time
     #reset column
