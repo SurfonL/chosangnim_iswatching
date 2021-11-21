@@ -74,9 +74,8 @@ class VideoProcessor:
             #
 
         else:
-            pose_predict = self.smoother(None)
+            pose_predict = self.smoother({'resting':10})
             pose_frame = max(pose_predict, key=pose_predict.get)
-            pose_prob = pose_predict[pose_frame]
 
 
         #현재 프레임이 resting인 경우
@@ -124,8 +123,6 @@ class VideoProcessor:
         self.prev_pose_frame = pose_frame
 
 
-
-
         # print('takes', time.time()-start)
         self.result_queue.put(self.table)
         pos = self.pose_state
@@ -164,7 +161,7 @@ def run():
     if ctx.video_processor:
         ctx.video_processor.goal = goal
     result = pd.DataFrame()
-    result.to_pickle('utils/cache/result{}.pkl'.format(rn))
+    result.to_pickle('utils/cache/results/result{}.pkl'.format(rn))
     if ctx.state.playing:
         while True:
             if ctx.video_processor:
@@ -173,7 +170,7 @@ def run():
                         timeout=1.0
                     )
                     #TODO: 사람마다 다르게 해야함
-                    result.to_pickle('utils/cache/result{}.pkl'.format(rn))
+                    result.to_pickle('utils/cache/results/result{}.pkl'.format(rn))
                 except queue.Empty:
                     result = None
                 labels_placeholder.table(result)
@@ -181,12 +178,8 @@ def run():
 
                 break
     else:
-        result = pd.read_pickle('utils/cache/result{}.pkl'.format(rn))
+        result = pd.read_pickle('utils/cache/results/result{}.pkl'.format(rn))
         labels_placeholder.table(result)
 
 
 run()
-
-#todo: statistic table
-#record sets and time automatically
-#reset button

@@ -34,7 +34,7 @@ class EMADictSmoothing(object):
             }
         """
         # Add new data to the beginning of the window for simpler code.
-        if not len(self._data_in_window) or data is None:
+        if not len(self._data_in_window):
             data={'resting':10}
             for i in range(self._window_size):
                 self._data_in_window.append(data)
