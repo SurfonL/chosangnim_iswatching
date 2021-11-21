@@ -7,7 +7,7 @@ import numpy as np
 
 class StandardProcess:
 
-    def __init__(self, model_complexity, av_size, av_alpha):
+    def __init__(self, model_complexity):
         self.pose = mp.solutions.pose.Pose(model_complexity=model_complexity)
         self.pose_embedder = FullBodyPoseEmbedder()
         self.pose_classifier = PoseClassifier(
@@ -15,9 +15,7 @@ class StandardProcess:
             pose_embedder=self.pose_embedder,
             top_n_by_max_distance=30,
             top_n_by_mean_distance=10)
-        self.pose_classification_filter = EMADictSmoothing(
-            window_size=av_size,
-            alpha=av_alpha)
+
 
 
     def std_process(self, frame, width = None, height = None):
@@ -36,11 +34,10 @@ class StandardProcess:
         landmarks_np = np.array([[lmk.x * self.frame_width, lmk.y * self.frame_height, lmk.z * self.frame_width]
                                  for lmk in landmarks.landmark], dtype=np.float32)
         pose_classification = self.pose_classifier(landmarks_np)
-        averaged_classification = self.pose_classification_filter(pose_classification)
 
-        return averaged_classification
+        return pose_classification
 
-def print_count(frame,height,width,count, goal, pose):
+def print_count(frame,height,width,count, goal, pose, pose_prob):
     if goal != 0:
         count = goal-count
         text = str(count) + " to go"
@@ -54,9 +51,17 @@ def print_count(frame,height,width,count, goal, pose):
 
     f_size = height/400
     f_thick = f_thick -1
-    t_size, _ = cv2.getTextSize(pose, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
-    frame = cv2.putText(frame, str(pose), (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15) +t_y*3),
+    t_size, t_y2 = cv2.getTextSize(pose, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
+    frame = cv2.putText(frame, pose, (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15) +t_y*3),
                         cv2.FONT_HERSHEY_SIMPLEX, f_size, (255, 255, 255), f_thick)
+
+    f_size = height/600
+    f_thick = f_thick -1
+    t_size, _ = cv2.getTextSize(pose_prob, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
+    frame = cv2.putText(frame, pose_prob, (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15) +t_y*3+t_y2*4),
+                        cv2.FONT_HERSHEY_SIMPLEX, f_size, (255, 255, 255), f_thick)
+
+
 
     return frame
 

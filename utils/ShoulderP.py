@@ -148,10 +148,10 @@ class ShoulderP:
 
     @staticmethod
     def validity(landmark):
-        lw= landmark[pos['left_wrist']].visibility >0.8
-        le= landmark[pos['left_elbow']].visibility >0.8
-        rw= landmark[pos['right_wrist']].visibility >0.8
-        re= landmark[pos['right_elbow']].visibility >0.8
+        lw= landmark[pos['left_wrist']].visibility >0.5
+        le= landmark[pos['left_elbow']].visibility >0.5
+        rw= landmark[pos['right_wrist']].visibility >0.5
+        re= landmark[pos['right_elbow']].visibility >0.5
         return (lw,le,rw,re)
 
 
