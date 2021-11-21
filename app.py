@@ -7,7 +7,6 @@ import queue
 from utils.ShoulderP import ShoulderP
 from utils.my_helpers import StandardProcess, print_count, workout_row
 from utils.KnnClassif import EMADictSmoothing
-import random
 
 frame = 15
 rest_thresh = 5
@@ -16,7 +15,7 @@ rest_thresh = 5
 class VideoProcessor:
     def __init__(self):
         self.Stdp = StandardProcess(
-            model_complexity = 0,
+            model_complexity = 2,
         )
         self.smoother = EMADictSmoothing(
             window_size=60,
