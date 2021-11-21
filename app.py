@@ -7,9 +7,12 @@ import queue
 from utils.ShoulderP import ShoulderP
 from utils.my_helpers import StandardProcess, print_count, workout_row
 from utils.KnnClassif import EMADictSmoothing
+import random
 
 frame = 15
 rest_thresh = 5
+rn = round(random.random(),5)
+
 
 #TODO: test av_size, av_alpha, framewidth+height
 class VideoProcessor:
@@ -95,7 +98,7 @@ class VideoProcessor:
         #현재 프레임이 운동중인 경우
         else:
             # 현재 프레임이 운동중이고 pose_state가 'resting'인 경우 => 운동 시작함
-            if time.time() - self.w_time > rest_thresh:
+            if self.pose_state == 'resting':
                 #운동 시간을 재기 시작하고, 휴식 시간 기록. pose_state를 운동중으로 바꿈
                 self.w_time = time.time()
 
@@ -169,7 +172,7 @@ def run():
                         timeout=1.0
                     )
                     #TODO: 사람마다 다르게 해야함
-                    result.to_pickle('utils/cache/result.pickle')
+                    result.to_pickle('utils/cache/result{}.pkl'.format(rn))
                 except queue.Empty:
                     result = None
                 labels_placeholder.table(result)
@@ -177,7 +180,7 @@ def run():
 
                 break
     else:
-        result = pd.read_pickle('utils/cache/result.pickle')
+        result = pd.read_pickle('utils/cache/result{}.pkl'.format(rn))
         labels_placeholder.table(result)
 
 
