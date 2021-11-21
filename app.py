@@ -106,7 +106,7 @@ class VideoProcessor:
                 if self.r_time != 0:
                     self.resting_time = time.time() - self.r_time
                 #프레임이 운동중인데 pose_state도 운동중인 경우
-                if self.workout != 'resting' or self.count!=0:
+                if self.workout != 'resting' and self.count!=0:
                     self.set_no+=1
                     row = workout_row(set_no=self.set_no, pose=self.workout, count=self.count, set_duration=round(self.workout_time,2),
                                       rest_duration=round(self.resting_time,2))
@@ -130,7 +130,7 @@ class VideoProcessor:
         self.result_queue.put(self.table)
         pos = self.pose_state
         #TODO: draw time, squat_down -> squat
-        frame = print_count(frame, height, width, self.count, self.goal, str(pos), str(round(pose_prob*10)))
+        frame = print_count(frame, height, width, self.count, self.goal, str(pos), str(round(pose_predict[pos]*10)))
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 
@@ -163,7 +163,8 @@ def run():
 
     if ctx.video_processor:
         ctx.video_processor.goal = goal
-
+    result = pd.DataFrame()
+    result.to_pickle('utils/cache/result{}.pkl'.format(rn))
     if ctx.state.playing:
         while True:
             if ctx.video_processor:
