@@ -5,6 +5,9 @@ import time
 import av
 import queue
 from utils.ShoulderP import ShoulderP
+from utils.Squat import Squat
+from utils.BenchP import BenchP
+from utils.DeadL import DeadL
 from utils.my_helpers import StandardProcess, print_count, workout_row
 from utils.KnnClassif import EMADictSmoothing
 import random
@@ -57,9 +60,8 @@ class VideoProcessor:
                 frame, self.count = ShoulderP.run_shoulderp(frame,landmarks)
 
             elif pose_frame == 'squat_down':
-                pass
-            #     frame = Squat.run_squat
-            #         also draw what pose it is
+                frame, self.count = Squat.run_sq(frame,pose_predict)
+
 
             elif pose_frame == 'bench_down':
                 pass
@@ -67,11 +69,8 @@ class VideoProcessor:
             #         pos state down then up => count
             #         draw
             elif pose_frame == 'dead_down':
-                pass
-            #       frame = Dead.run_dead(pos_state, landmarks)
-            #         pos state down then up => count
-            #         draw
-            #
+                frame, self.count = DeadL.run_sq(frame, pose_predict)
+
 
         else:
             pose_predict = self.smoother({'resting':10})
@@ -113,6 +112,8 @@ class VideoProcessor:
 
                 self.count = 0
                 ShoulderP.times = 0
+                DeadL.times = 0
+                Squat.times = 0
                 #TODO: do it for all counters
 
                 self.pose_state = pose_frame
