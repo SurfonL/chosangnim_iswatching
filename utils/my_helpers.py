@@ -38,7 +38,7 @@ class StandardProcess:
 
         return pose_classification
 
-def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,debug):
+def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,rest_thresh, debug):
     if pose == 'squat_down':
         pose = 'squat'
     elif pose == 'bench_down' or pose == 'bench_up':
@@ -66,7 +66,7 @@ def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,
 
     now = time.time()
     if pose == 'resting':
-        r_time = now if r_time == 0 else r_time
+        r_time = now if r_time < rest_thresh else r_time+rest_thresh
         t = str(round(now-r_time,1))
     else:
         t = str(round(now-w_time,1))

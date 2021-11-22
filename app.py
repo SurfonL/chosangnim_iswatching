@@ -14,11 +14,9 @@ import random
 import numpy as np
 
 frame = 15
-rest_thresh = 5
+
 rn = round(random.random(),5)
 
-
-#TODO: test av_size, av_alpha, framewidth+height
 class VideoProcessor:
     def __init__(self):
         self.Stdp = StandardProcess(
@@ -40,6 +38,7 @@ class VideoProcessor:
         self.set_no = 0
         self.goal = 0
 
+        self.rest_thresh = 5
         self.r_time = 0
         self.w_time = 0
         self.table = pd.DataFrame()
@@ -105,7 +104,7 @@ class VideoProcessor:
                 self.r_time = time.time()
                 # self.pose_state = self.prev_pose_frame
             #그런데 interval 시간이 15초 이상이면
-            if time.time() - self.r_time >rest_thresh:
+            if time.time() - self.r_time >self.rest_thresh:
                 #휴식시간이다. 지금까지 세트 운동 시간 기록.
                 if self.pose_state != 'resting':
                     self.workout_time = time.time() - self.w_time
@@ -126,8 +125,8 @@ class VideoProcessor:
                 #프레임이 운동중인데 pose_state도 운동중인 경우
                 if self.workout != 'resting' and self.count!=0:
                     self.set_no+=1
-                    row = workout_row(set_no=self.set_no, pose=self.workout, count=self.count, set_duration=round(self.workout_time,2),
-                                      rest_duration=round(self.resting_time,2))
+                    row = workout_row(set_no=self.set_no, pose=self.workout, count=self.count,
+                                      set_duration=round(self.workout_time,2), rest_duration=round(self.resting_time-self.rest_thresh,2))
                     self.table = self.table.append(row)
 
                 self.count = 0
@@ -153,11 +152,10 @@ class VideoProcessor:
         # print('takes', time.time()-start)
         self.result_queue.put(self.table)
         pos = self.pose_state
-        #TODO: draw time, squat_down -> squat
         frame = print_count(frame, height, width,
                             self.count, self.goal,
                             str(pos), str(round(pose_predict[pos]*10)),
-                            self.w_time, self.r_time,
+                            self.w_time, self.r_time,self.rest_thresh,
                             self.debug)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
@@ -220,7 +218,6 @@ def run():
                     result = ctx.video_processor.result_queue.get(
                         timeout=1.0
                     )
-                    #TODO: 사람마다 다르게 해야함
                     result.to_pickle('utils/cache/results/result{}.pkl'.format(rn))
                 except queue.Empty:
                     result = None
@@ -231,12 +228,5 @@ def run():
     else:
         result = pd.read_pickle('utils/cache/results/result{}.pkl'.format(rn))
         labels_placeholder.table(result)
-
-
-
-
-
-
-
 
 run()
