@@ -39,6 +39,14 @@ class StandardProcess:
         return pose_classification
 
 def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,debug):
+    if pose == 'squat_down':
+        pose = 'squat'
+    elif pose == 'bench_down' or pose == 'bench_up':
+        pose = 'bench press'
+    elif pose == 'dead_down':
+        pose = 'deadlift'
+
+
     if goal != 0:
         count = goal-count
         text = str(count) + " to go"
