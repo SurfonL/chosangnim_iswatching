@@ -8,10 +8,24 @@ class EMADictSmoothing(object):
     def __init__(self, window_size=10, alpha=0.2):
         self._window_size = window_size
         self._alpha = alpha
-
+        self._class_names = self.class_names()
         self._data_in_window = []
 
+    def class_names(self):
+        class_names = list()
+        file_lists = os.listdir('utils/fitness_poses_csvs_out')
+        for file_name in file_lists:
+            name,_ = os.path.splitext(file_name)
+            class_names.append(name)
+
+        return set(class_names)
+
+    def set_rate(self,win,alpha):
+        self._window_size = win
+        self._alpha = alpha
+
     def __call__(self, data):
+
         """Smoothes given pose classification.
 
         Smoothing is done by computing Exponential Moving Average for every pose
@@ -33,6 +47,9 @@ class EMADictSmoothing(object):
               'pushups_up': 1.7,
             }
         """
+
+
+
         # Add new data to the beginning of the window for simpler code.
         if not len(self._data_in_window):
             data={'resting':10}
@@ -61,7 +78,8 @@ class EMADictSmoothing(object):
                 factor *= (1.0 - self._alpha)
 
             smoothed_data[key] = top_sum / bottom_sum
-
+        for key in self._class_names - keys:
+            smoothed_data.update({key:0})
         return smoothed_data
 
 
@@ -115,7 +133,6 @@ class PoseClassifier(object):
         """
         # Each file in the folder represents one pose class.
         file_names = [name for name in os.listdir(pose_samples_folder) if name.endswith(file_extension)]
-
         pose_samples = []
         for file_name in file_names:
             # Use file name as pose class name.
@@ -218,7 +235,7 @@ class PoseClassifier(object):
 
         # Collect results into map: (class_name -> n_samples)
         class_names = [self._pose_samples[sample_idx].class_name for _, sample_idx in mean_dist_heap]
-        result = {class_name: class_names.count(class_name) for class_name in set(class_names)}
+        result = {class_name: class_names.count(class_name)/self._top_n_by_mean_distance*10 for class_name in set(class_names)}
 
         return result
 

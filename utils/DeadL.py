@@ -1,5 +1,5 @@
 class DeadL:
-    _class_name = 'dead_d'
+    _class_name = 'dead_down'
 
     # If pose counter passes given threshold, then we enter the pose.
     _enter_threshold = 6
@@ -49,6 +49,11 @@ class DeadL:
             cls._pose_entered = False
 
         return cls.times
+
+    @classmethod
+    def set_thresh(cls, enter, exit):
+        cls._enter_threshold = enter
+        cls._exit_threshold = exit
 
     @classmethod
     def run_dl(cls, frame, pose_predict):

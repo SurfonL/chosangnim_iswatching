@@ -1,5 +1,5 @@
 class Squat:
-    _class_name = 'squat_d'
+    _class_name = 'squat_down'
 
     # If pose counter passes given threshold, then we enter the pose.
     _enter_threshold = 6
@@ -48,7 +48,11 @@ class Squat:
             cls.times += 1
             cls._pose_entered = False
 
-        return cls.times
+    @classmethod
+    def set_thresh(cls,enter,exit):
+        cls._enter_threshold=enter
+        cls._exit_threshold=exit
+
 
     @classmethod
     def run_sq(cls, frame, pose_predict):
@@ -57,5 +61,4 @@ class Squat:
         # frame = draw_bp(frame)
 
         return frame, cls.times
-
 
