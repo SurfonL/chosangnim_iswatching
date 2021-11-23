@@ -1,3 +1,5 @@
+from utils.Drawing import drawing
+
 class Squat:
     _class_name = 'squat_down'
 
@@ -53,10 +55,21 @@ class Squat:
         cls._enter_threshold=enter
         cls._exit_threshold=exit
 
+    @staticmethod
+    def draw_circle(frame, landmarks):
+        frame_height, frame_width = frame.shape[0], frame.shape[1]
+        right_hip = landmarks.landmark[23]
+        left_hip = landmarks.landmark[24]
+        frame = drawing.image_alpha(frame, right_hip.x * frame_width, right_hip.y * frame_height, 30, (0, 255, 0), 0.3,
+                                    1, 1)
+        frame = drawing.image_alpha(frame, left_hip.x * frame_width, left_hip.y * frame_height, 30, (0, 255, 0), 0.3, 1,
+                                    1)
+        return frame
 
     @classmethod
-    def run_sq(cls, frame, pose_predict):
+    def run_sq(cls, frame, pose_predict, landmarks):
         cls.count_sq(pose_predict)
+        cls.draw_circle(frame, landmarks)
         # draw things
         # frame = draw_bp(frame)
 
