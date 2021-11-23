@@ -56,7 +56,7 @@ class DeadL:
         cls._exit_threshold = exit
 
     @classmethod
-    def run_dl(cls, frame, pose_predict):
+    def run_dl(cls, frame, pose_predict, landmarks):
         cls.count_dl(pose_predict)
         # draw things
         # frame = draw_bp(frame)

@@ -12,6 +12,7 @@ from utils.my_helpers import StandardProcess, print_count, workout_row, draw_lan
 from utils.KnnClassif import EMADictSmoothing
 import random
 import numpy as np
+import pandas as pd
 
 frame = 15
 
@@ -66,13 +67,13 @@ class VideoProcessor:
                 if pose_frame == 'shoulder':
                     frame, self.count = ShoulderP.run_shoulderp(frame,landmarks)
                 elif pose_frame == 'squat_down':
-                    frame, self.count = Squat.run_sq(frame,pose_predict)
+                    frame, self.count = Squat.run_sq(frame,pose_predict, landmarks)
                     Squat.set_thresh(en,ex)
                 elif pose_frame == 'bench_down':
-                    frame, self.count = BenchP.run_bp(frame, pose_predict)
+                    frame, self.count = BenchP.run_bp(frame, pose_predict, landmarks)
                     BenchP.set_thresh(en,ex)
                 elif pose_frame == 'dead_down':
-                    frame, self.count = DeadL.run_dl(frame, pose_predict)
+                    frame, self.count = DeadL.run_dl(frame, pose_predict, landmarks)
                     DeadL.set_thresh(en, ex)
 
             else:
@@ -81,11 +82,11 @@ class VideoProcessor:
                 if self.pose_state == 'shoulder':
                     frame, self.count = ShoulderP.run_shoulderp(frame, landmarks)
                 elif self.pose_state == 'squat_down':
-                    frame, self.count = Squat.run_sq(frame, pose_predict)
+                    frame, self.count = Squat.run_sq(frame, pose_predict, landmarks)
                 elif self.pose_state == 'bench_down':
-                    frame, self.count = BenchP.run_bp(frame, pose_predict)
+                    frame, self.count = BenchP.run_bp(frame, pose_predict, landmarks)
                 elif self.pose_state == 'dead_down':
-                    frame, self.count = DeadL.run_dl(frame, pose_predict)
+                    frame, self.count = DeadL.run_dl(frame, pose_predict, landmarks)
 
 
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame

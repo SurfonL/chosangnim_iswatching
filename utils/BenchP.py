@@ -56,7 +56,7 @@ class BenchP:
         cls._exit_threshold = exit
 
     @classmethod
-    def run_bp(cls,frame,pose_predict):
+    def run_bp(cls,frame,pose_predict, landmarks):
         cls.count_bp(pose_predict)
         #draw things
         #frame = draw_bp(frame)
