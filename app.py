@@ -21,7 +21,7 @@ rn = round(random.random(),5)
 class VideoProcessor:
     def __init__(self):
         self.Stdp = StandardProcess(
-            model_complexity = 0,)
+            model_complexity = 2,)
         self.Shoulder = ShoulderP()
         self.Squat = Squat()
         self.Bench = BenchP()
