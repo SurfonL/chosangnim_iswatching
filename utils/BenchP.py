@@ -3,15 +3,18 @@ from utils.Drawing import drawing
 
 class BenchP(Workouts):
     def __init__(self):
-        super().__init__()
-        self._class_name = 'bench_down'
-        self._pose_samples_folder = 'utils/pose_plots/bench'
 
-    def run_bp(self,frame, landmarks):
-        self.count(landmarks)
+        self._class_name = 'bench_down'
+        self.init('utils/pose_plots/bench')
+
+
+    def run_bp(self,frame, landmarks, landmarks_np):
+        pose_knn = self.pose_classifier(landmarks_np)
+        pose_predict = self.smoother(pose_knn)
+        self.count(pose_predict)
         #draw things
         #frame = draw_bp(frame)
 
-        return frame, self.times
+        return pose_predict
 
 

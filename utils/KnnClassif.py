@@ -5,15 +5,16 @@ import numpy as np
 class EMADictSmoothing(object):
     """Smoothes pose classification."""
 
-    def __init__(self, window_size=10, alpha=0.2):
+    def __init__(self, csv_dir, window_size=10, alpha=0.2):
         self._window_size = window_size
         self._alpha = alpha
-        self._class_names = self.class_names()
+        self._class_names = self.class_names(csv_dir)
         self._data_in_window = []
 
-    def class_names(self):
+
+    def class_names(self, _csv_dir):
         class_names = list()
-        file_lists = os.listdir('utils/fitness_poses_csvs_out')
+        file_lists = os.listdir(_csv_dir)
         for file_name in file_lists:
             name,_ = os.path.splitext(file_name)
             class_names.append(name)
@@ -192,7 +193,6 @@ class PoseClassifier(object):
             }
         """
         # Check that provided and target poses have the same shape.
-
 
 
         assert pose_landmarks.shape == (self._n_landmarks, self._n_dimensions), 'Unexpected shape: {}'.format(

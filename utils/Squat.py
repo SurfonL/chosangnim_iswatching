@@ -3,9 +3,8 @@ from utils.Workouts import Workouts
 
 class Squat(Workouts):
     def __init__(self):
-        super().__init__()
         self._class_name = 'squat_down'
-        self._pose_samples_folder = 'utils/pose_plots/squat'
+        self.init('utils/pose_plots/squat')
 
     @classmethod
     def draw_circle(cls, frame, pose_predict, landmarks):
@@ -29,11 +28,18 @@ class Squat(Workouts):
                                         1, 1, fill=False)
         return frame
 
-    def run_sq(self, frame, landmarks):
-        self.count(landmarks)
-        self.draw_circle(frame, pose_predict[cls._class_name], landmarks)
+    def run_sq(self, frame, landmarks, landmarks_np):
+
+        pose_knn = self.pose_classifier(landmarks_np)
+
+        pose_predict = self.smoother(pose_knn)
+
+        print(pose_predict)
+        self.count(pose_predict)
+
+        self.draw_circle(frame, pose_predict[self._class_name], landmarks)
         # draw things
         # frame = draw_bp(frame)
 
-        return frame, self.times
+        return pose_predict
 

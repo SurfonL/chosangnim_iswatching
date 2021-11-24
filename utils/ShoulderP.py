@@ -8,12 +8,15 @@ pos = {'nose': 0, 'right_shoulder' : 11, 'right_elbow' : 13,'right_wrist' : 15,
             'right_ankle' : 27, 'left_hip' : 24, 'left_knee' : 26, 'left_ankle' : 28 }
 class ShoulderP(Workouts):
     def __init__(self):
-        super().__init__()
+
         self.times = 0
         self.rate_r = 0
         self.rate_l = 0
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.state = False
+
+        _pose_samples_folder = 'utils/pose_plots/shoulder'
+        self.init('utils/pose_plots/shoulder')
 
 
     def sp_count(self, landmark, old_sp_state):
@@ -66,8 +69,7 @@ class ShoulderP(Workouts):
 
         return ud
 
-    @classmethod
-    def draw_circle(cls, frame, landmark, frame_height, frame_width):
+    def draw_circle(self, frame, landmark, frame_height, frame_width):
         right_wrist_x, right_wrist_y = landmark[pos['right_wrist']].x, landmark[pos['right_wrist']].y
         left_wrist_x, left_wrist_y = landmark[pos['left_wrist']].x, landmark[pos['left_wrist']].y
         right_wrist_x *= frame_width
@@ -75,15 +77,15 @@ class ShoulderP(Workouts):
         left_wrist_x *= frame_width
         left_wrist_y *= frame_height
 
-        lw, le, rw, re = cls.validity(landmark)
+        lw, le, rw, re = self.validity(landmark)
 
-        if cls.rate_l > 0 and cls.rate_r > 0:
+        if self.rate_l > 0 and self.rate_r > 0:
             if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
             if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
         else:
-            if cls.rate_r > -1 and cls.rate_l > -1:
-                if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_r), 1)
-                if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_l), 1)
+            if self.rate_r > -1 and self.rate_l > -1:
+                if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(self.rate_r), 1)
+                if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(self.rate_l), 1)
             else:
                 if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
                 if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
@@ -158,7 +160,7 @@ class ShoulderP(Workouts):
         return (lw,le,rw,re)
 
 
-    def run_sp(self, frame, landmarks):
+    def run_sp(self, frame, landmarks, landmarks_np):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
 
         val = self.validity(landmarks.landmark)
@@ -169,5 +171,8 @@ class ShoulderP(Workouts):
 
         frame = self.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
 
-        return frame, self.times
+        pose_knn = self.pose_classifier(landmarks_np)
+        pose_predict = self.smoother(pose_knn)
+
+        return pose_predict
 
