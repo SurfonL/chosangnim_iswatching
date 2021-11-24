@@ -13,6 +13,10 @@ class Workouts:
     _window = 10
     _alpha = 0.1
 
+    _max_d = 30
+    _min_d = 10
+
+
     # Either we are in given pose or not.
     _pose_entered = False
 
@@ -33,8 +37,8 @@ class Workouts:
         cls.pose_classifier = PoseClassifier(
             pose_samples_folder=_pose_samples_folder,
             pose_embedder=cls.pose_embedder,
-            top_n_by_max_distance=20,
-            top_n_by_mean_distance=7)
+            top_n_by_max_distance=cls._max_d,
+            top_n_by_mean_distance=cls._min_d)
 
 
     @classmethod
@@ -87,4 +91,9 @@ class Workouts:
     @classmethod
     def set_smooth(cls, win, alpha):
         cls. _window = win
+        cls._alpha = alpha
+
+    @classmethod
+    def set_max_d(cls, win, alpha):
+        cls._window = win
         cls._alpha = alpha
