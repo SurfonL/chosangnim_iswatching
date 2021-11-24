@@ -14,14 +14,14 @@ import random
 import numpy as np
 import pandas as pd
 
-frame = 15
+frame = 1
 
 rn = round(random.random(),5)
 
 class VideoProcessor:
     def __init__(self):
         self.Stdp = StandardProcess(
-            model_complexity = 2,)
+            model_complexity = 0,)
         self.Shoulder = ShoulderP()
         self.Squat = Squat()
         self.Bench = BenchP()
@@ -63,7 +63,7 @@ class VideoProcessor:
             bpp = self.Bench.run_bp(frame, landmarks, landmarks_np)
             dlp = self.Dead.run_dl(frame, landmarks, landmarks_np)
 
-            print(shp)
+            print(shp,sqp,bpp,dlp)
 
             #debug mode
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame
