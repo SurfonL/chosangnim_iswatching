@@ -158,7 +158,7 @@ class ShoulderP(Workouts):
         return (lw,le,rw,re)
 
 
-    def run_shoulderp(self, frame, landmarks):
+    def run_sp(self, frame, landmarks):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
 
         val = self.validity(landmarks.landmark)
