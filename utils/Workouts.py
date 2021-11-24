@@ -29,7 +29,7 @@ class Workouts:
     smoother = EMADictSmoothing(window_size=_window,
                                      alpha=_alpha)
     @classmethod
-    def count(cls, landmarks):
+    def count(cls, pose_predict):
 
         """Counts number of repetitions happend until given frame.
 
@@ -49,8 +49,7 @@ class Workouts:
         Returns:
           Integer counter of repetitions.
         """
-        pose_knn = cls.pose_classifier(landmarks)
-        pose_predict = cls.smoother(pose_knn)
+
 
 
 

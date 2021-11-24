@@ -30,10 +30,12 @@ class Squat(Workouts):
         return frame
 
     def run_sq(self, frame, landmarks):
-        self.count(landmarks)
-        self.draw_circle(frame, pose_predict[cls._class_name], landmarks)
+        pose_knn = self.pose_classifier(landmarks)
+        pose_predict = self.smoother(pose_knn)
+        self.count(pose_predict)
+        self.draw_circle(frame, pose_predict[self._class_name], landmarks)
         # draw things
         # frame = draw_bp(frame)
 
-        return frame, self.times
+        return pose_predict
 

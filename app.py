@@ -56,10 +56,10 @@ class VideoProcessor:
         start = time.time()
         frame, landmarks, height, width = self.Stdp.std_process(frame, width= None, height= None)
         if landmarks is not None:
-            frame, count_sh = self.Shoulder.run_sp(frame,landmarks, self.activate)
-            frame, count_sq = self.Squat.run_sq(frame, landmarks, self.activate)
-            frame, count_bp = self.Bench.run_bp(frame, landmarks,self.activate)
-            frame, count_dl = self.Dead.run_dl(frame, landmarks,self.activate)
+            frame, count_sh = self.Shoulder.run_sp(frame,landmarks,)
+            frame, count_sq = self.Squat.run_sq(frame, landmarks)
+            frame, count_bp = self.Bench.run_bp(frame, landmarks)
+            frame, count_dl = self.Dead.run_dl(frame, landmarks)
 
             #debug mode
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame

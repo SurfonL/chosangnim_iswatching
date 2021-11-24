@@ -169,5 +169,8 @@ class ShoulderP(Workouts):
 
         frame = self.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
 
-        return frame, self.times
+        pose_knn = self.pose_classifier(landmarks)
+        pose_predict = self.smoother(pose_knn)
+
+        return pose_predict
 
