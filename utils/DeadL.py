@@ -1,21 +1,15 @@
-from utils.Drawing import drawing
+from utils.Workouts import Workouts
 
-class DeadL:
-    _class_name = 'dead_down'
+class DeadL(Workouts):
 
-    # If pose counter passes given threshold, then we enter the pose.
-    _enter_threshold = 6
-    _exit_threshold = 4
+    def __init__(self):
+        super().__init__()
+        self._class_name = 'dead_down'
+        self._pose_samples_folder = 'utils/pose_plots/deadlift'
 
-    # Either we are in given pose or not.
-    _pose_entered = False
 
-    # Number of times we exited the pose.
-    times = 0
-
-    @classmethod
-    def count_dl(cls, pose_classification):
-        """Counts number of repetitions happend until given frame.
+    def run_dl(self, frame, landmarks):
+        self.count(landmarks)
 
         We use two thresholds. First you need to go above the higher one to enter
         the pose, and then you need to go below the lower one to exit it. Difference
@@ -89,9 +83,10 @@ class DeadL:
     def run_dl(cls, frame, pose_predict, landmarks):
         cls.count_dl(pose_predict)
         cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
+
         # draw things
         # frame = draw_bp(frame)
 
-        return frame, cls.times
+        return frame, self.times
 
 

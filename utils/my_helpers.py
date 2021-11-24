@@ -1,7 +1,6 @@
 import pandas as pd
 import time
 
-from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 import mediapipe as mp
 import cv2
 import numpy as np
@@ -10,12 +9,6 @@ class StandardProcess:
 
     def __init__(self, model_complexity):
         self.pose = mp.solutions.pose.Pose(model_complexity=model_complexity)
-        self.pose_embedder = FullBodyPoseEmbedder()
-        self.pose_classifier = PoseClassifier(
-            pose_samples_folder='utils/fitness_poses_csvs_out',
-            pose_embedder=self.pose_embedder,
-            top_n_by_max_distance=30,
-            top_n_by_mean_distance=15)
 
 
 
