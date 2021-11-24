@@ -18,9 +18,9 @@ class Squat(Workouts):
                                         1)
         elif pose_predict > cls._exit_threshold:
             frame = drawing.image_alpha(frame, right_hip.x * frame_width, right_hip.y * frame_height, 30, (0, 255, 255),
-                                        0.3, pose_predict - cls._exit_threshold, cls._enter_threshold - cls._enter_threshold)
+                                        0.3, pose_predict - cls._exit_threshold, cls._enter_threshold - cls._exit_threshold)
             frame = drawing.image_alpha(frame, left_hip.x * frame_width, left_hip.y * frame_height, 30, (0, 255, 255),
-                                        0.3, pose_predict - cls._exit_threshold, cls._enter_threshold - cls._enter_threshold)
+                                        0.3, pose_predict - cls._exit_threshold, cls._enter_threshold - cls._exit_threshold)
         else:
             frame = drawing.image_alpha(frame, right_hip.x * frame_width, right_hip.y * frame_height, 30, (255, 255, 255), 0.3,
                                         1, 1, fill=False)
