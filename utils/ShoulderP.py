@@ -1,19 +1,22 @@
 import numpy as np
 import cv2
+from utils.Workouts import Workouts
 
 
 pos = {'nose': 0, 'right_shoulder' : 11, 'right_elbow' : 13,'right_wrist' : 15,
             'left_shoulder' : 12,'left_elbow' : 14,'left_wrist' : 16, 'right_hip' : 23,'right_knee' : 25,
             'right_ankle' : 27, 'left_hip' : 24, 'left_knee' : 26, 'left_ankle' : 28 }
-class ShoulderP:
-    times = 0
-    rate_r = 0
-    rate_l = 0
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    state = False
+class ShoulderP(Workouts):
+    def __init__(self):
+        super().__init__()
+        self.times = 0
+        self.rate_r = 0
+        self.rate_l = 0
+        self.font = cv2.FONT_HERSHEY_SIMPLEX
+        self.state = False
 
-    @classmethod
-    def sp_count(cls, landmark, old_sp_state):
+
+    def sp_count(self, landmark, old_sp_state):
         # [x_coord,y_coord]
         wrist_r = landmark[pos['right_wrist']]
         elbow_r = landmark[pos['right_elbow']]
@@ -27,8 +30,8 @@ class ShoulderP:
         threshold = landmark[pos['nose']].y
 
         # boolean. define the position of each arm. True => up, False => down
-        arm_r = cls.ud_state(wrist_r, elbow_r, threshold)
-        arm_l = cls.ud_state(wrist_l, elbow_l, threshold)
+        arm_r = self.ud_state(wrist_r, elbow_r, threshold)
+        arm_l = self.ud_state(wrist_l, elbow_l, threshold)
 
         # if both arms are 'up' it is in up state.
         if arm_r and arm_l:
@@ -38,7 +41,7 @@ class ShoulderP:
 
         #if [up] and [state before this was 'down'] then count.
         if ud and not old_sp_state:
-            cls.times += 1
+            self.times += 1
         else:
             pass
 
@@ -56,8 +59,8 @@ class ShoulderP:
         #     cls.rate_r = (threshold - elbow_r[1]) / propor_r
         #     cls.rate_l = (threshold - elbow_l[1]) / propor_l
         if propor_r > 0.1 and propor_l > 0.1:
-            cls.rate_r = (threshold - elbow_r.y) / propor_r
-            cls.rate_l = (threshold - elbow_l.y) / propor_l
+            self.rate_r = (threshold - elbow_r.y) / propor_r
+            self.rate_l = (threshold - elbow_l.y) / propor_l
         else:
             pass
 
@@ -148,24 +151,23 @@ class ShoulderP:
 
     @staticmethod
     def validity(landmark):
-        lw= landmark[pos['left_wrist']].visibility >0.5
-        le= landmark[pos['left_elbow']].visibility >0.5
-        rw= landmark[pos['right_wrist']].visibility >0.5
-        re= landmark[pos['right_elbow']].visibility >0.5
+        lw= landmark[pos['left_wrist']].visibility >0.2
+        le= landmark[pos['left_elbow']].visibility >0.2
+        rw= landmark[pos['right_wrist']].visibility >0.2
+        re= landmark[pos['right_elbow']].visibility >0.2
         return (lw,le,rw,re)
 
 
-    @classmethod
-    def run_shoulderp(cls, frame, landmarks):
+    def run_shoulderp(self, frame, landmarks):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
 
-        val = cls.validity(landmarks.landmark)
+        val = self.validity(landmarks.landmark)
         if all(val):
-            cls.state = cls.sp_count(landmarks.landmark, cls.state)
+            self.state = self.sp_count(landmarks.landmark, self.state)
         else:
             pass
 
-        frame = cls.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
+        frame = self.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
 
-        return frame, cls.times
+        return frame, self.times
 

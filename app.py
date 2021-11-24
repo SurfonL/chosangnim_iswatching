@@ -21,11 +21,8 @@ rn = round(random.random(),5)
 class VideoProcessor:
     def __init__(self):
         self.Stdp = StandardProcess(
-            model_complexity = 0,
-        )
-        self.smoother = EMADictSmoothing(
-            window_size=60,
-            alpha=0.1)
+            model_complexity = 0,)
+
 
         self.result_queue = queue.Queue()
         self.locked = False
