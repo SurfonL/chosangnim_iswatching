@@ -10,8 +10,8 @@ class Workouts:
     _enter_threshold = 6
     _exit_threshold = 4
 
-    _window = 10
-    _alpha = 0.1
+    _window = 50
+    _alpha = 0.0005
 
     _max_d = 30
     _min_d = 10
@@ -29,7 +29,6 @@ class Workouts:
     pose_embedder = FullBodyPoseEmbedder()
 
 
-    @classmethod
     def init(cls, _pose_samples_folder):
         cls.smoother = EMADictSmoothing(_pose_samples_folder,
                                 window_size=cls._window,
@@ -63,9 +62,6 @@ class Workouts:
           Integer counter of repetitions.
         """
 
-
-
-
         # Get pose confidence.
         pose_confidence = 0.0
         if cls._class_name in pose_predict:
@@ -82,6 +78,8 @@ class Workouts:
         if pose_confidence < cls._exit_threshold:
             cls.times += 1
             cls._pose_entered = False
+
+
 
     @classmethod
     def set_thresh(cls,enter,exit):

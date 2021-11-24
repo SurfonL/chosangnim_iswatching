@@ -162,17 +162,17 @@ class ShoulderP(Workouts):
 
     def run_sp(self, frame, landmarks, landmarks_np):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
+        pose_knn = self.pose_classifier(landmarks_np)
+        pose_predict = self.smoother(pose_knn)
 
-        val = self.validity(landmarks.landmark)
-        if all(val):
+        if pose_predict['shoulder']>self._enter_threshold:
             self.state = self.sp_count(landmarks.landmark, self.state)
         else:
             pass
 
         frame = self.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
 
-        pose_knn = self.pose_classifier(landmarks_np)
-        pose_predict = self.smoother(pose_knn)
+
 
         return pose_predict
 

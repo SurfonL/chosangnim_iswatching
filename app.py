@@ -14,7 +14,7 @@ import random
 import numpy as np
 import pandas as pd
 
-frame = 1
+frame = 10
 
 rn = round(random.random(),5)
 
@@ -48,7 +48,13 @@ class VideoProcessor:
         self.resting_time = 0
         self.workout_time = 0
 
-        self.debug = False
+        self.debug = True
+
+        self.switch =0
+
+
+        self.enter_sens = 6
+        self.exit_sens = 4
 
 
 
@@ -58,25 +64,29 @@ class VideoProcessor:
         if landmarks is not None:
             landmarks_np = np.array([[lmk.x * width, lmk.y * height, lmk.z * width]
                                      for lmk in landmarks.landmark], dtype=np.float32)
-            shp = self.Shoulder.run_sp(frame, landmarks, landmarks_np)
-            sqp = self.Squat.run_sq(frame, landmarks, landmarks_np)
-            bpp = self.Bench.run_bp(frame, landmarks, landmarks_np)
-            dlp = self.Dead.run_dl(frame, landmarks, landmarks_np)
 
-            print(shp,sqp,bpp,dlp)
-            print(self.Shoulder.times)
-
+            shp = self.Shoulder.run_sp(frame, landmarks, landmarks_np) if not self.count or self.switch == 0 else {'shoulder':0}
+            sqp = self.Squat.run_sq(frame, landmarks, landmarks_np) if not self.count or self.switch ==1 else {'squat':0}
+            bpp = self.Bench.run_bp(frame, landmarks, landmarks_np) if not self.count or self.switch ==2 else {'bench':0}
+            dlp = self.Dead.run_dl(frame, landmarks, landmarks_np) if not self.count or self.switch ==3 else {'deadlift':0}
             #debug mode
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame
+            pose_predict = {**shp, **sqp, **bpp, **dlp}
 
         else:
+            pose_predict = {'resting':10, 'shoulder': 0, 'squat':0, 'bench': 0, 'deadlift': 0}
             # pose_predict = self.smoother({'resting':10})
             # pose_frame = max(pose_predict, key=pose_predict.get)
             pass
 
+        counts = [self.Shoulder.times, self.Squat.times, self.Bench.times, self.Dead.times]
 
-        pose_concat = {**shp,**sqp,**bpp,**dlp}.pop('resting')
-        pose_frame = np.max()
+        res = pose_predict.pop('resting')
+        if pose_predict:
+            pose_frame = max(pose_predict, key=pose_predict.get) if max(pose_predict.values()) > self.exit_sens else 'resting'
+        else:
+            pose_frame = 'resting'
+        pose_predict.update({'resting':res})
 
         #현재 프레임이 resting인 경우
         if pose_frame == 'resting':
@@ -84,7 +94,7 @@ class VideoProcessor:
             if self.prev_pose_frame != 'resting':
                 #interval 시간을 잼 그리고 일단 pose_state는 하던 운동임
                 self.r_time = time.time()
-                # self.pose_state = self.prev_pose_frame
+
             #그런데 interval 시간이 15초 이상이면
             if time.time() - self.r_time >self.rest_thresh:
                 #휴식시간이다. 지금까지 세트 운동 시간 기록.
@@ -111,27 +121,28 @@ class VideoProcessor:
                                       set_duration=round(self.workout_time,2), rest_duration=round(self.resting_time-self.rest_thresh,2))
                     self.table = self.table.append(row)
 
+
+                self.Shoulder.times = 0
+                self.Dead.times = 0
+                self.Squat.times = 0
+                self.Bench.times =0
                 self.count = 0
-                ShoulderP.times = 0
-                DeadL.times = 0
-                Squat.times = 0
-                BenchP.times =0
 
                 self.pose_state = pose_frame
             else:
                 #현 프레임 운동중, 현 pose_state 운동중
                 if np.max(counts):
-                    self.pose_state = ['shoulder', 'squat_down', 'bench_down', 'dead_down'][np.argmax(counts)]
-                    self.locked = True
+                    self.switch = np.argmax(counts)
+                    self.pose_state = ['shoulder','squat','bench','deadlift'][self.switch]
                 else:
                     self.pose_state = pose_frame
-                    self.locked = False
-
         self.prev_pose_frame = pose_frame
 
 
 
-        print('takes', time.time()-start)
+        self.count = np.max(counts)
+
+        # print('takes', time.time()-start)
         self.result_queue.put(self.table)
         pos = self.pose_state
         frame = print_count(frame, height, width,
@@ -140,7 +151,6 @@ class VideoProcessor:
                             self.w_time, self.r_time,self.rest_thresh,
                             self.debug)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
-
 
 
 def run():

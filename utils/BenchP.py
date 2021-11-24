@@ -4,7 +4,7 @@ from utils.Drawing import drawing
 class BenchP(Workouts):
     def __init__(self):
 
-        self._class_name = 'bench_down'
+        self._class_name = 'bench'
         self.init('utils/pose_plots/bench')
 
 

@@ -3,7 +3,7 @@ from utils.Workouts import Workouts
 
 class Squat(Workouts):
     def __init__(self):
-        self._class_name = 'squat_down'
+        self._class_name = 'squat'
         self.init('utils/pose_plots/squat')
 
     @classmethod
@@ -34,7 +34,6 @@ class Squat(Workouts):
 
         pose_predict = self.smoother(pose_knn)
 
-        print(pose_predict)
         self.count(pose_predict)
 
         self.draw_circle(frame, pose_predict[self._class_name], landmarks)

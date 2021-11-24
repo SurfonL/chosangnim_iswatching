@@ -31,14 +31,10 @@ class StandardProcess:
 
         return pose_classification
 
-def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,rest_thresh, debug):
-    if pose == 'squat_down':
-        pose = 'squat'
-    elif pose == 'bench_down' or pose == 'bench_up':
-        pose = 'bench press'
-    elif pose == 'dead_down':
-        pose = 'deadlift'
+def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,rest_thresh, debug=True):
 
+    if pose == 'bench':
+        pose = 'bench press'
 
     if goal != 0:
         count = goal-count
@@ -71,7 +67,7 @@ def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,
 
     if debug:
         f_size = height / 600
-        f_thick = f_thick - 1
+        f_thick = f_thick - 1 if f_thick >1 else 1
         t_size, _ = cv2.getTextSize(pose_prob, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
         frame = cv2.putText(frame, pose_prob,
                             (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15) + t_y * 3 + t_y2*7),
