@@ -59,9 +59,9 @@ class VideoProcessor:
             landmarks_np = np.array([[lmk.x * width, lmk.y * height, lmk.z * width]
                                      for lmk in landmarks.landmark], dtype=np.float32)
             shp = self.Shoulder.run_sp(frame, landmarks, landmarks_np)
-            # sqp = self.Squat.run_sq(frame, landmarks, landmarks_np)
-            # bpp = self.Bench.run_bp(frame, landmarks, landmarks_np)
-            # dlp = self.Dead.run_dl(frame, landmarks, landmarks_np)
+            sqp = self.Squat.run_sq(frame, landmarks, landmarks_np)
+            bpp = self.Bench.run_bp(frame, landmarks, landmarks_np)
+            dlp = self.Dead.run_dl(frame, landmarks, landmarks_np)
 
             print(shp)
 
