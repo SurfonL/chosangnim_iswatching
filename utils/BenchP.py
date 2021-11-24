@@ -3,9 +3,11 @@ from utils.Drawing import drawing
 
 class BenchP(Workouts):
     def __init__(self):
-        super().__init__()
+
         self._class_name = 'bench_down'
         self._pose_samples_folder = 'utils/pose_plots/bench'
+        super().__init__()
+
 
     def run_bp(self,frame, landmarks):
         pose_knn = self.pose_classifier(landmarks)

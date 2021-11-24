@@ -18,6 +18,7 @@ class Workouts:
     # Number of times we exited the pose.
     times = 0
 
+    csv_dir = None
 
 
     pose_embedder = FullBodyPoseEmbedder()
@@ -26,8 +27,11 @@ class Workouts:
         pose_embedder=pose_embedder,
         top_n_by_max_distance=30,
         top_n_by_mean_distance=10)
-    smoother = EMADictSmoothing(window_size=_window,
-                                     alpha=_alpha)
+    smoother = EMADictSmoothing(_pose_samples_folder,
+                                window_size=_window,
+                                     alpha=_alpha,
+
+                                )
     @classmethod
     def count(cls, pose_predict):
 
