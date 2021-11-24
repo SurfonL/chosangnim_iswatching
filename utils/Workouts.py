@@ -7,11 +7,10 @@ class Workouts:
 
 
     # If pose counter passes given threshold, then we enter the pose.
-    _enter_threshold = 6
-    _exit_threshold = 4
+
 
     _window = 50
-    _alpha = 0.001
+    _alpha = 0.005
 
     _max_d = 30
     _min_d = 10

@@ -131,6 +131,7 @@ class VideoProcessor:
                 self.pose_state = pose_frame
             else:
                 #현 프레임 운동중, 현 pose_state 운동중
+                print(counts)
                 if np.max(counts):
                     self.switch = np.argmax(counts)
                     self.pose_state = ['shoulder','squat','bench','deadlift'][self.switch]

@@ -9,6 +9,8 @@ pos = {'nose': 0, 'right_shoulder' : 11, 'right_elbow' : 13,'right_wrist' : 15,
 class ShoulderP(Workouts):
     def __init__(self):
 
+        self._exit_threshold = 4
+
         self.times = 0
         self.rate_r = 0
         self.rate_l = 0
@@ -165,7 +167,7 @@ class ShoulderP(Workouts):
         pose_knn = self.pose_classifier(landmarks_np)
         pose_predict = self.smoother(pose_knn)
 
-        if pose_predict['shoulder']>self._enter_threshold:
+        if pose_predict['shoulder']>self._exit_threshold:
             self.state = self.sp_count(landmarks.landmark, self.state)
         else:
             pass
