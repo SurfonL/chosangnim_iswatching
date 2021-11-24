@@ -1,3 +1,5 @@
+from utils.Drawing import drawing
+
 class BenchP:
     _class_name = 'bench_down'
 
@@ -56,8 +58,33 @@ class BenchP:
         cls._exit_threshold = exit
 
     @classmethod
+    def draw_circle(cls, frame, pose_predict, landmarks):
+        frame_height, frame_width = frame.shape[0], frame.shape[1]
+        right_elbow = landmarks.landmark[13]
+        left_elbow = landmarks.landmark[14]
+        if pose_predict > cls._enter_threshold:
+            frame = drawing.image_alpha(frame, right_elbow.x * frame_width, right_elbow.y * frame_height, 30, (0, 255, 0),
+                                        0.3, 1, 1)
+            frame = drawing.image_alpha(frame, left_elbow.x * frame_width, left_elbow.y * frame_height, 30, (0, 255, 0),
+                                        0.3, 1, 1)
+        elif pose_predict > cls._exit_threshold:
+            frame = drawing.image_alpha(frame, right_elbow.x * frame_width, right_elbow.y * frame_height, 30, (0, 255, 255),
+                                        0.3, pose_predict - cls._exit_threshold,
+                                        cls._enter_threshold - cls._enter_threshold)
+            frame = drawing.image_alpha(frame, left_elbow.x * frame_width, left_elbow.y * frame_height, 30, (0, 255, 255),
+                                        0.3, pose_predict - cls._exit_threshold,
+                                        cls._enter_threshold - cls._enter_threshold)
+        else:
+            frame = drawing.image_alpha(frame, right_elbow.x * frame_width, right_elbow.y * frame_height, 30,
+                                        (255, 255, 255), 0.3, 1, 1, fill=False)
+            frame = drawing.image_alpha(frame, left_elbow.x * frame_width, left_elbow.y * frame_height, 30, (255, 255, 255),
+                                        0.3, 1, 1, fill=False)
+        return frame
+
+    @classmethod
     def run_bp(cls,frame,pose_predict, landmarks):
         cls.count_bp(pose_predict)
+        cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
         #draw things
         #frame = draw_bp(frame)
 
