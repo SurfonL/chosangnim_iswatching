@@ -5,12 +5,12 @@ class BenchP(Workouts):
     def __init__(self):
 
         self._class_name = 'bench_down'
-        self._pose_samples_folder = 'utils/pose_plots/bench'
+        Workouts._pose_samples_folder = 'utils/pose_plots/bench'
         super().__init__()
 
 
-    def run_bp(self,frame, landmarks):
-        pose_knn = self.pose_classifier(landmarks)
+    def run_bp(self,frame, landmarks, landmarks_np):
+        pose_knn = self.pose_classifier(landmarks_np)
         pose_predict = self.smoother(pose_knn)
         self.count(pose_predict)
         #draw things

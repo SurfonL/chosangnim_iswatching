@@ -160,7 +160,7 @@ class ShoulderP(Workouts):
         return (lw,le,rw,re)
 
 
-    def run_sp(self, frame, landmarks):
+    def run_sp(self, frame, landmarks, landmarks_np):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
 
         val = self.validity(landmarks.landmark)
@@ -171,7 +171,7 @@ class ShoulderP(Workouts):
 
         frame = self.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
 
-        pose_knn = self.pose_classifier(landmarks)
+        pose_knn = self.pose_classifier(landmarks_np)
         pose_predict = self.smoother(pose_knn)
 
         return pose_predict

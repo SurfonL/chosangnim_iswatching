@@ -15,6 +15,7 @@ class EMADictSmoothing(object):
     def class_names(self, _csv_dir):
         class_names = list()
         file_lists = os.listdir(_csv_dir)
+        print('file_lists--------------------------------------------', _csv_dir)
         for file_name in file_lists:
             name,_ = os.path.splitext(file_name)
             class_names.append(name)
@@ -195,7 +196,7 @@ class PoseClassifier(object):
         # Check that provided and target poses have the same shape.
 
 
-        print(pose_landmarks)
+
         assert pose_landmarks.shape == (self._n_landmarks, self._n_dimensions), 'Unexpected shape: {}'.format(
             pose_landmarks.shape)
 

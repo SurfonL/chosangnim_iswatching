@@ -56,83 +56,85 @@ class VideoProcessor:
         start = time.time()
         frame, landmarks, height, width = self.Stdp.std_process(frame, width= None, height= None)
         if landmarks is not None:
-            shp = self.Shoulder.run_sp(frame,landmarks)
-            sqp = self.Squat.run_sq(frame, landmarks)
-            bpp = self.Bench.run_bp(frame, landmarks)
-            dlp = self.Dead.run_dl(frame, landmarks)
+            landmarks_np = np.array([[lmk.x * width, lmk.y * height, lmk.z * width]
+                                     for lmk in landmarks.landmark], dtype=np.float32)
+            shp = self.Shoulder.run_sp(frame, landmarks, landmarks_np)
+            sqp = self.Squat.run_sq(frame, landmarks, landmarks_np)
+            bpp = self.Bench.run_bp(frame, landmarks, landmarks_np)
+            dlp = self.Dead.run_dl(frame, landmarks, landmarks_np)
 
             print(shp, sqp, bpp, dlp)
 
             #debug mode
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame
 
-        else:
-            pose_predict = self.smoother({'resting':10})
-            pose_frame = max(pose_predict, key=pose_predict.get)
-
-        counts = [ShoulderP.times, Squat.times, BenchP.times, DeadL.times]
-
-        #현재 프레임이 resting인 경우
-        if pose_frame == 'resting':
-            #직전이 resting이 아닌데 현재 프레임이 resting이면
-            if self.prev_pose_frame != 'resting':
-                #interval 시간을 잼 그리고 일단 pose_state는 하던 운동임
-                self.r_time = time.time()
-                # self.pose_state = self.prev_pose_frame
-            #그런데 interval 시간이 15초 이상이면
-            if time.time() - self.r_time >self.rest_thresh:
-                #휴식시간이다. 지금까지 세트 운동 시간 기록.
-                if self.pose_state != 'resting':
-                    self.workout_time = time.time() - self.w_time
-                    self.workout = self.pose_state
-                self.pose_state = 'resting'
-
-
-        #현재 프레임이 운동중인 경우
-        else:
-            # 현재 프레임이 운동중이고 pose_state가 'resting'인 경우 => 운동 시작함
-            if self.pose_state == 'resting':
-                #운동 시간을 재기 시작하고, 휴식 시간 기록. pose_state를 운동중으로 바꿈
-                self.w_time = time.time()
-
-                #skip initialization
-                if self.r_time != 0:
-                    self.resting_time = time.time() - self.r_time
-                #프레임이 운동중인데 pose_state도 운동중인 경우
-                if self.workout != 'resting' and self.count!=0:
-                    self.set_no+=1
-                    row = workout_row(set_no=self.set_no, pose=self.workout, count=self.count,
-                                      set_duration=round(self.workout_time,2), rest_duration=round(self.resting_time-self.rest_thresh,2))
-                    self.table = self.table.append(row)
-
-                self.count = 0
-                ShoulderP.times = 0
-                DeadL.times = 0
-                Squat.times = 0
-                BenchP.times =0
-
-                self.pose_state = pose_frame
-            else:
-                #현 프레임 운동중, 현 pose_state 운동중
-                if np.max(counts):
-                    self.pose_state = ['shoulder', 'squat_down', 'bench_down', 'dead_down'][np.argmax(counts)]
-                    self.locked = True
-                else:
-                    self.pose_state = pose_frame
-                    self.locked = False
-
-        self.prev_pose_frame = pose_frame
-
-
-
-        # print('takes', time.time()-start)
-        self.result_queue.put(self.table)
-        pos = self.pose_state
-        frame = print_count(frame, height, width,
-                            self.count, self.goal,
-                            str(pos), str(round(pose_predict[pos]*10)),
-                            self.w_time, self.r_time,self.rest_thresh,
-                            self.debug)
+        # else:
+        #     pose_predict = self.smoother({'resting':10})
+        #     pose_frame = max(pose_predict, key=pose_predict.get)
+        #
+        # counts = [ShoulderP.times, Squat.times, BenchP.times, DeadL.times]
+        #
+        # #현재 프레임이 resting인 경우
+        # if pose_frame == 'resting':
+        #     #직전이 resting이 아닌데 현재 프레임이 resting이면
+        #     if self.prev_pose_frame != 'resting':
+        #         #interval 시간을 잼 그리고 일단 pose_state는 하던 운동임
+        #         self.r_time = time.time()
+        #         # self.pose_state = self.prev_pose_frame
+        #     #그런데 interval 시간이 15초 이상이면
+        #     if time.time() - self.r_time >self.rest_thresh:
+        #         #휴식시간이다. 지금까지 세트 운동 시간 기록.
+        #         if self.pose_state != 'resting':
+        #             self.workout_time = time.time() - self.w_time
+        #             self.workout = self.pose_state
+        #         self.pose_state = 'resting'
+        #
+        #
+        # #현재 프레임이 운동중인 경우
+        # else:
+        #     # 현재 프레임이 운동중이고 pose_state가 'resting'인 경우 => 운동 시작함
+        #     if self.pose_state == 'resting':
+        #         #운동 시간을 재기 시작하고, 휴식 시간 기록. pose_state를 운동중으로 바꿈
+        #         self.w_time = time.time()
+        #
+        #         #skip initialization
+        #         if self.r_time != 0:
+        #             self.resting_time = time.time() - self.r_time
+        #         #프레임이 운동중인데 pose_state도 운동중인 경우
+        #         if self.workout != 'resting' and self.count!=0:
+        #             self.set_no+=1
+        #             row = workout_row(set_no=self.set_no, pose=self.workout, count=self.count,
+        #                               set_duration=round(self.workout_time,2), rest_duration=round(self.resting_time-self.rest_thresh,2))
+        #             self.table = self.table.append(row)
+        #
+        #         self.count = 0
+        #         ShoulderP.times = 0
+        #         DeadL.times = 0
+        #         Squat.times = 0
+        #         BenchP.times =0
+        #
+        #         self.pose_state = pose_frame
+        #     else:
+        #         #현 프레임 운동중, 현 pose_state 운동중
+        #         if np.max(counts):
+        #             self.pose_state = ['shoulder', 'squat_down', 'bench_down', 'dead_down'][np.argmax(counts)]
+        #             self.locked = True
+        #         else:
+        #             self.pose_state = pose_frame
+        #             self.locked = False
+        #
+        # self.prev_pose_frame = pose_frame
+        #
+        #
+        #
+        # # print('takes', time.time()-start)
+        # self.result_queue.put(self.table)
+        # pos = self.pose_state
+        # frame = print_count(frame, height, width,
+        #                     self.count, self.goal,
+        #                     str(pos), str(round(pose_predict[pos]*10)),
+        #                     self.w_time, self.r_time,self.rest_thresh,
+        #                     self.debug)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 
