@@ -11,7 +11,7 @@ class Workouts:
     _exit_threshold = 4
 
     _window = 50
-    _alpha = 0.0005
+    _alpha = 0.001
 
     _max_d = 30
     _min_d = 10
@@ -42,6 +42,8 @@ class Workouts:
 
     @classmethod
     def count(cls, pose_predict):
+        print(pose_predict)
+        print(cls.times, '--------------------------------------------------------------')
 
         """Counts number of repetitions happend until given frame.
 
