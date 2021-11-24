@@ -5,11 +5,12 @@ class Workouts:
     _class_name = None
     _pose_samples_folder= None
 
+
     # If pose counter passes given threshold, then we enter the pose.
     _enter_threshold = 6
     _exit_threshold = 4
 
-    _window = 60
+    _window = 10
     _alpha = 0.1
 
     # Either we are in given pose or not.
@@ -22,16 +23,20 @@ class Workouts:
 
 
     pose_embedder = FullBodyPoseEmbedder()
-    pose_classifier = PoseClassifier(
-        pose_samples_folder=_pose_samples_folder,
-        pose_embedder=pose_embedder,
-        top_n_by_max_distance=30,
-        top_n_by_mean_distance=10)
-    smoother = EMADictSmoothing(_pose_samples_folder,
-                                window_size=_window,
-                                     alpha=_alpha,
 
-                                )
+
+    @classmethod
+    def init(cls, _pose_samples_folder):
+        cls.smoother = EMADictSmoothing(_pose_samples_folder,
+                                window_size=cls._window,
+                                     alpha=cls._alpha)
+        cls.pose_classifier = PoseClassifier(
+            pose_samples_folder=_pose_samples_folder,
+            pose_embedder=cls.pose_embedder,
+            top_n_by_max_distance=20,
+            top_n_by_mean_distance=7)
+
+
     @classmethod
     def count(cls, pose_predict):
 

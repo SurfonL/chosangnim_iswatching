@@ -15,8 +15,8 @@ class ShoulderP(Workouts):
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.state = False
 
-        Workouts._pose_samples_folder = 'utils/pose_plots/shoulder'
-        super().__init__()
+        _pose_samples_folder = 'utils/pose_plots/shoulder'
+        self.init('utils/pose_plots/shoulder')
 
 
     def sp_count(self, landmark, old_sp_state):

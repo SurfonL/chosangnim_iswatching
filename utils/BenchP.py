@@ -5,8 +5,7 @@ class BenchP(Workouts):
     def __init__(self):
 
         self._class_name = 'bench_down'
-        Workouts._pose_samples_folder = 'utils/pose_plots/bench'
-        super().__init__()
+        self.init('utils/pose_plots/bench')
 
 
     def run_bp(self,frame, landmarks, landmarks_np):
