@@ -35,6 +35,7 @@ class VideoProcessor:
         self.pose_state = 'resting'
         self.workout = 'resting'
 
+        self.activate = False
         self.count = 0
         self.count_rec = 0
         self.set_no = 0
@@ -55,40 +56,12 @@ class VideoProcessor:
         start = time.time()
         frame, landmarks, height, width = self.Stdp.std_process(frame, width= None, height= None)
         if landmarks is not None:
-            pose_knn = self.Stdp.pose_class(landmarks)
-            pose_predict = self.smoother(pose_knn)
-            pose_frame = max(pose_predict,key=pose_predict.get)
-            pose_prob = pose_predict[pose_frame]
+            frame, count_sh = self.Shoulder.run_sp(frame,landmarks, self.activate)
+            frame, count_sq = self.Squat.run_sq(frame, landmarks, self.activate)
+            frame, count_bp = self.Bench.run_bp(frame, landmarks,self.activate)
+            frame, count_dl = self.Dead.run_dl(frame, landmarks,self.activate)
 
-            if not self.locked:
-                self.smoother.set_rate(60,0.1)
-                en = 5
-                ex = 6
-                if pose_frame == 'shoulder':
-                    frame, self.count = ShoulderP.run_shoulderp(frame,landmarks)
-                elif pose_frame == 'squat_down':
-                    frame, self.count = Squat.run_sq(frame,pose_predict, landmarks)
-                    Squat.set_thresh(en,ex)
-                elif pose_frame == 'bench_down':
-                    frame, self.count = BenchP.run_bp(frame, pose_predict, landmarks)
-                    BenchP.set_thresh(en,ex)
-                elif pose_frame == 'dead_down':
-                    frame, self.count = DeadL.run_dl(frame, pose_predict, landmarks)
-                    DeadL.set_thresh(en, ex)
-
-            else:
-                #locked
-                self.smoother.set_rate(10, 0.2)
-                if self.pose_state == 'shoulder':
-                    frame, self.count = ShoulderP.run_shoulderp(frame, landmarks)
-                elif self.pose_state == 'squat_down':
-                    frame, self.count = Squat.run_sq(frame, pose_predict, landmarks)
-                elif self.pose_state == 'bench_down':
-                    frame, self.count = BenchP.run_bp(frame, pose_predict, landmarks)
-                elif self.pose_state == 'dead_down':
-                    frame, self.count = DeadL.run_dl(frame, pose_predict, landmarks)
-
-
+            #debug mode
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame
 
         else:
