@@ -8,8 +8,8 @@ class DeadL(Workouts):
         self._pose_samples_folder = 'utils/pose_plots/deadlift'
 
 
-    def run_dl(self, frame, pose_predict, landmarks):
-        self.count(pose_predict)
+    def run_dl(self, frame, landmarks):
+        self.count(landmarks)
 
         # draw things
         # frame = draw_bp(frame)

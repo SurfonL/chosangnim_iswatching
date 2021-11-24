@@ -1,30 +1,36 @@
 from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 
 class Workouts:
-    def __init__(self):
-        self._class_name = None
-        self._pose_samples_folder= None
 
-        # If pose counter passes given threshold, then we enter the pose.
-        self._enter_threshold = 6
-        self._exit_threshold = 4
+    _class_name = None
+    _pose_samples_folder= None
 
-        # Either we are in given pose or not.
-        self._pose_entered = False
+    # If pose counter passes given threshold, then we enter the pose.
+    _enter_threshold = 6
+    _exit_threshold = 4
 
-        # Number of times we exited the pose.
-        self.times = 0
+    _window = 60
+    _alpha = 0.1
 
+    # Either we are in given pose or not.
+    _pose_entered = False
 
-        self.pose_embedder = FullBodyPoseEmbedder()
-        self.pose_classifier = PoseClassifier(
-            pose_samples_folder=self._pose_samples_folder,
-            pose_embedder=self.pose_embedder,
-            top_n_by_max_distance=30,
-            top_n_by_mean_distance=10)
+    # Number of times we exited the pose.
+    times = 0
 
 
-    def count(self, pose_classification):
+
+    pose_embedder = FullBodyPoseEmbedder()
+    pose_classifier = PoseClassifier(
+        pose_samples_folder=_pose_samples_folder,
+        pose_embedder=pose_embedder,
+        top_n_by_max_distance=30,
+        top_n_by_mean_distance=10)
+    smoother = EMADictSmoothing(window_size=_window,
+                                     alpha=_alpha)
+    @classmethod
+    def count(cls, landmarks):
+
         """Counts number of repetitions happend until given frame.
 
         We use two thresholds. First you need to go above the higher one to enter
@@ -43,23 +49,34 @@ class Workouts:
         Returns:
           Integer counter of repetitions.
         """
+        pose_knn = cls.pose_classifier(landmarks)
+        pose_predict = cls.smoother(pose_knn)
+
+
+
         # Get pose confidence.
         pose_confidence = 0.0
-        if self._class_name in pose_classification:
-            pose_confidence = pose_classification[self._class_name]
+        if cls._class_name in pose_predict:
+            pose_confidence = pose_predict[cls._class_name]
 
         # On the very first frame or if we were out of the pose, just check if we
         # entered it on this frame and update the state.
-        if not self._pose_entered:
-            self._pose_entered = pose_confidence > self._enter_threshold
-            return self.times
+        if not cls._pose_entered:
+            cls._pose_entered = pose_confidence > cls._enter_threshold
+            return cls.times
 
         # If we were in the pose and are exiting it, then increase the counter and
         # update the state.
-        if pose_confidence < self._exit_threshold:
-            self.times += 1
-            self._pose_entered = False
+        if pose_confidence < cls._exit_threshold:
+            cls.times += 1
+            cls._pose_entered = False
 
-    def set_thresh(self,enter,exit):
-        self._enter_threshold=enter
-        self._exit_threshold=exit
+    @classmethod
+    def set_thresh(cls,enter,exit):
+        cls._enter_threshold=enter
+        cls._exit_threshold=exit
+
+    @classmethod
+    def set_smooth(cls, win, alpha):
+        cls. _window = win
+        cls._alpha = alpha

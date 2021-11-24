@@ -18,8 +18,8 @@ class Squat(Workouts):
                                     1)
         return frame
 
-    def run_sq(self, frame, pose_predict, landmarks):
-        self.count(pose_predict)
+    def run_sq(self, frame, landmarks):
+        self.count(landmarks)
         self.draw_circle(frame, landmarks)
         # draw things
         # frame = draw_bp(frame)

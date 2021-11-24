@@ -9,7 +9,7 @@ from utils.Squat import Squat
 from utils.BenchP import BenchP
 from utils.DeadL import DeadL
 from utils.my_helpers import StandardProcess, print_count, workout_row, draw_landmarks
-from utils.KnnClassif import EMADictSmoothing
+
 import random
 import numpy as np
 import pandas as pd
@@ -22,6 +22,10 @@ class VideoProcessor:
     def __init__(self):
         self.Stdp = StandardProcess(
             model_complexity = 0,)
+        self.Shoulder = ShoulderP()
+        self.Squat = Squat()
+        self.Bench = BenchP()
+        self.Dead = DeadL()
 
 
         self.result_queue = queue.Queue()
@@ -51,7 +55,6 @@ class VideoProcessor:
         start = time.time()
         frame, landmarks, height, width = self.Stdp.std_process(frame, width= None, height= None)
         if landmarks is not None:
-            frame = frame
             pose_knn = self.Stdp.pose_class(landmarks)
             pose_predict = self.smoother(pose_knn)
             pose_frame = max(pose_predict,key=pose_predict.get)
