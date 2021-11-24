@@ -127,7 +127,7 @@ class VideoProcessor:
         #
         #
         #
-        # # print('takes', time.time()-start)
+        print('takes', time.time()-start)
         # self.result_queue.put(self.table)
         # pos = self.pose_state
         # frame = print_count(frame, height, width,
