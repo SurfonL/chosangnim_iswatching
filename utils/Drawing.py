@@ -12,6 +12,9 @@ class drawing:
                 marker_radius: circle radius
                 RGB: Tuple RGB color
                 alpha: transparent intensity of circle
+                frame_count: present state(probability)
+                fold_frame: threshold of the color change
+                fill: default is filling inside the circle. If you want to draw only circle line, set 'False'
 
             Returns: Image with circle
 
