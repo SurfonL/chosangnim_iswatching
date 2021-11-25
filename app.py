@@ -200,13 +200,13 @@ def run():
             rest_thresh = st.slider('resting threshold', value = 5, min_value =1, max_value = 30)
 
             col1, col2 = st.columns(2)
-            ins = col1.slider('initial enter sensitivity', value=4.0, min_value=float(0), max_value=float(10))
-            ixs = col1.slider('initial exit sensitivity', value=6.0, min_value=float(0), max_value=float(10))
+            ins = col1.slider('initial enter sensitivity', value=6.0, min_value=float(0), max_value=float(10))
+            ixs = col1.slider('initial exit sensitivity', value=4.0, min_value=float(0), max_value=float(10))
             iew = col1.slider('initial ema window', value=60, min_value=0, max_value=300)
             iea = col1.slider('initial ema alpha', value=0.1, min_value=float(0), max_value=float(1))
 
-            lns = col2.slider('locked enter sensitivity', value=3.0, min_value=float(0), max_value=float(10))
-            lxs = col2.slider('locked exit sensitivity', value=7.0, min_value=float(0), max_value=float(10))
+            lns = col2.slider('locked enter sensitivity', value=7.0, min_value=float(0), max_value=float(10))
+            lxs = col2.slider('locked exit sensitivity', value=3.0, min_value=float(0), max_value=float(10))
             lew = col2.slider('locked ema window', value=30, min_value=0, max_value=100)
             lea = col2.slider('locked ema alpha', value=0.1, min_value=float(0), max_value=float(1))
 
