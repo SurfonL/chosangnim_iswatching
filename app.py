@@ -42,11 +42,15 @@ class VideoProcessor:
         self.mod_comp = 2
         self.Stdp = StandardProcess(
             model_complexity=self.mod_comp, )
+        self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
         self.rest_thresh = 5
         self.ien = 5
         self.iex = 6
         self.iw = 60
         self.ia = 0.05
+
+        self.top_n_mean = 10
+        self.top_n_max = 30
 
 
 
@@ -56,7 +60,7 @@ class VideoProcessor:
         frame, landmarks, height, width = self.Stdp.std_process(frame, width= None, height= None)
         if landmarks is not None:
             frame = frame
-            pose_knn = self.Stdp.pose_class(landmarks)
+            pose_knn = self.Stdp.pose_class(landmarks,self.top_n_mean, self.top_n_max)
             pose_predict = self.smoother(pose_knn)
             pose_frame = max(pose_predict,key=pose_predict.get)
             pose_prob = pose_predict[pose_frame]
@@ -65,7 +69,7 @@ class VideoProcessor:
                 self.smoother.set_rate(self.iw,self.ia)
 
                 if pose_frame == 'shoulder':
-                    frame, self.count = ShoulderP.run_shoulderp(frame,landmarks)
+                    frame, self.count = ShoulderP.run_sp(frame,landmarks)
                 elif pose_frame == 'squat_down':
                     frame, self.count = Squat.run_sq(frame,pose_predict, landmarks)
                     Squat.set_thresh(self.ien, self.iex)
@@ -80,7 +84,7 @@ class VideoProcessor:
                 #locked
                 self.smoother.set_rate(10, 0.2)
                 if self.pose_state == 'shoulder':
-                    frame, self.count = ShoulderP.run_shoulderp(frame, landmarks)
+                    frame, self.count = ShoulderP.run_sp(frame, landmarks)
                 elif self.pose_state == 'squat_down':
                     frame, self.count = Squat.run_sq(frame, pose_predict, landmarks)
                 elif self.pose_state == 'bench_down':
@@ -213,6 +217,9 @@ def run():
         ctx.video_processor.rest_thresh = rest_thresh
         ctx.video_processor.ien = ins
         ctx.video_processor.iex = ixs
+        ctx.video_processor.iw = iew
+        ctx.video_processor.ia= iea
+
 
 
 

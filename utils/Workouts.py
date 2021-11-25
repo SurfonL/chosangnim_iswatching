@@ -16,12 +16,7 @@ class Workouts:
         self.times = 0
 
 
-        self.pose_embedder = FullBodyPoseEmbedder()
-        self.pose_classifier = PoseClassifier(
-            pose_samples_folder=self._pose_samples_folder,
-            pose_embedder=self.pose_embedder,
-            top_n_by_max_distance=30,
-            top_n_by_mean_distance=10)
+
 
 
     def count(self, pose_classification):

@@ -1,8 +1,7 @@
 from utils.Workouts import Workouts
 
-class BenchP(Workouts):
+class BenchP:
     _class_name = 'bench_down'
-    _pose_samples_folder = 'utils/pose_plots/bench'
     times = 0
     _pose_entered = False
     _enter_threshold = 6

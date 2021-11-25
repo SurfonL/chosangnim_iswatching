@@ -1,11 +1,55 @@
 from utils.Drawing import drawing
-from utils.Workouts import Workouts
 
-class Squat(Workouts):
-    def __init__(self):
-        super().__init__()
-        self._class_name = 'squat_down'
-        self._pose_samples_folder = 'utils/pose_plots/squat'
+
+class Squat:
+    _class_name = 'squat_down'
+    times = 0
+    _pose_entered = False
+    _enter_threshold = 6
+    _exit_threshold = 4
+
+    @classmethod
+    def count(cls, pose_classification):
+       """Counts number of repetitions happend until given frame.
+
+       We use two thresholds. First you need to go above the higher one to enter
+       the pose, and then you need to go below the lower one to exit it. Difference
+       between the thresholds makes it stable to prediction jittering (which will
+       cause wrong counts in case of having only one threshold).
+
+       Args:
+         pose_classification: Pose classification dictionary on current frame.
+           Sample:
+             {
+               'pushups_down': 8.3,
+               'pushups_up': 1.7,
+             }
+
+       Returns:
+         Integer counter of repetitions.
+       """
+       # Get pose confidence.
+       pose_confidence = 0.0
+       if cls._class_name in pose_classification:
+           pose_confidence = pose_classification[cls._class_name]
+
+       # On the very first frame or if we were out of the pose, just check if we
+       # entered it on this frame and update the state.
+       if not cls._pose_entered:
+           cls._pose_entered = pose_confidence > cls._enter_threshold
+           return cls.times
+
+       # If we were in the pose and are exiting it, then increase the counter and
+       # update the state.
+       if pose_confidence < cls._exit_threshold:
+           cls.times += 1
+           cls._pose_entered = False
+
+    @classmethod
+    def set_thresh(cls, enter, exit):
+        cls._enter_threshold = enter
+        cls._exit_threshold = exit
+
 
     @staticmethod
     def draw_circle(frame, landmarks):
@@ -18,11 +62,12 @@ class Squat(Workouts):
                                     1)
         return frame
 
-    def run_sq(self, frame, pose_predict, landmarks):
-        self.count(pose_predict)
-        self.draw_circle(frame, landmarks)
+    @classmethod
+    def run_sq(cls, frame, pose_predict, landmarks):
+        cls.count(pose_predict)
+        cls.draw_circle(frame, landmarks)
         # draw things
         # frame = draw_bp(frame)
 
-        return frame, self.times
+        return frame, cls.times
 

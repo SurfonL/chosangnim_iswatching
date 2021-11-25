@@ -10,8 +10,12 @@ class StandardProcess:
 
     def __init__(self, model_complexity):
         self.pose = mp.solutions.pose.Pose(model_complexity=model_complexity)
-
-
+        self.pose_embedder = FullBodyPoseEmbedder()
+        self.pose_classifier = PoseClassifier(
+            pose_samples_folder='utils/fitness_poses_csvs_out',
+            pose_embedder=self.pose_embedder,
+            top_n_by_max_distance=30,
+            top_n_by_mean_distance=10)
 
 
     def std_process(self, frame, width = None, height = None):
@@ -26,10 +30,11 @@ class StandardProcess:
 
         return frame, landmarks, self.frame_height, self.frame_width
 
-    def pose_class(self, landmarks):
+    def pose_class(self, landmarks, n_min, n_max):
         landmarks_np = np.array([[lmk.x * self.frame_width, lmk.y * self.frame_height, lmk.z * self.frame_width]
                                  for lmk in landmarks.landmark], dtype=np.float32)
         pose_classification = self.pose_classifier(landmarks_np)
+        pose_classification.set_minmax(n_min,n_max)
 
         return pose_classification
 

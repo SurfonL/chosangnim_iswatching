@@ -111,6 +111,10 @@ class PoseClassifier(object):
                                                      n_dimensions,
                                                      pose_embedder)
 
+    def set_minmaxn(self, mean=10, max=30):
+        self._top_n_by_mean_distance = mean
+        self._top_n_by_max_distance = max
+
     def _load_pose_samples(self,
                            pose_samples_folder,
                            file_extension,

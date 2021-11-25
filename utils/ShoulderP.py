@@ -6,22 +6,18 @@ from utils.Drawing import drawing
 pos = {'nose': 0, 'right_shoulder' : 11, 'right_elbow' : 13,'right_wrist' : 15,
             'left_shoulder' : 12,'left_elbow' : 14,'left_wrist' : 16, 'right_hip' : 23,'right_knee' : 25,
             'right_ankle' : 27, 'left_hip' : 24, 'left_knee' : 26, 'left_ankle' : 28 }
-class ShoulderP(Workouts):
-    def __init__(self):
+class ShoulderP:
+    _exit_threshold = 4
 
-        self._exit_threshold = 4
-
-        self.times = 0
-        self.rate_r = 0
-        self.rate_l = 0
-        self.font = cv2.FONT_HERSHEY_SIMPLEX
-        self.state = False
-
-        _pose_samples_folder = 'utils/pose_plots/shoulder'
-        self.init('utils/pose_plots/shoulder')
+    times = 0
+    rate_r = 0
+    rate_l = 0
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    state = False
 
 
-    def sp_count(self, landmark, old_sp_state):
+    @classmethod
+    def sp_count(cls, landmark, old_sp_state):
         # [x_coord,y_coord]
         wrist_r = landmark[pos['right_wrist']]
         elbow_r = landmark[pos['right_elbow']]
@@ -35,8 +31,8 @@ class ShoulderP(Workouts):
         threshold = landmark[pos['nose']].y
 
         # boolean. define the position of each arm. True => up, False => down
-        arm_r = self.ud_state(wrist_r, elbow_r, threshold)
-        arm_l = self.ud_state(wrist_l, elbow_l, threshold)
+        arm_r = cls.ud_state(wrist_r, elbow_r, threshold)
+        arm_l = cls.ud_state(wrist_l, elbow_l, threshold)
 
         # if both arms are 'up' it is in up state.
         if arm_r and arm_l:
@@ -46,7 +42,7 @@ class ShoulderP(Workouts):
 
         #if [up] and [state before this was 'down'] then count.
         if ud and not old_sp_state:
-            self.times += 1
+            cls.times += 1
         else:
             pass
 
@@ -64,14 +60,15 @@ class ShoulderP(Workouts):
         #     cls.rate_r = (threshold - elbow_r[1]) / propor_r
         #     cls.rate_l = (threshold - elbow_l[1]) / propor_l
         if propor_r > 0.1 and propor_l > 0.1:
-            self.rate_r = (threshold - elbow_r.y) / propor_r
-            self.rate_l = (threshold - elbow_l.y) / propor_l
+            cls.rate_r = (threshold - elbow_r.y) / propor_r
+            cls.rate_l = (threshold - elbow_l.y) / propor_l
         else:
             pass
 
         return ud
 
-    def draw_circle(self, frame, landmark, frame_height, frame_width):
+    @classmethod
+    def draw_circle(cls, frame, landmark, frame_height, frame_width):
         right_wrist_x, right_wrist_y = landmark[pos['right_wrist']].x, landmark[pos['right_wrist']].y
         left_wrist_x, left_wrist_y = landmark[pos['left_wrist']].x, landmark[pos['left_wrist']].y
         right_wrist_x *= frame_width
@@ -79,15 +76,15 @@ class ShoulderP(Workouts):
         left_wrist_x *= frame_width
         left_wrist_y *= frame_height
 
-        lw, le, rw, re = self.validity(landmark)
+        lw, le, rw, re = cls.validity(landmark)
 
-        if self.rate_l > 0 and self.rate_r > 0:
+        if cls.rate_l > 0 and cls.rate_r > 0:
             if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
             if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
         else:
-            if self.rate_r > -1 and self.rate_l > -1:
-                if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(self.rate_r), 1)
-                if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(self.rate_l), 1)
+            if cls.rate_r > -1 and cls.rate_l > -1:
+                if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_r), 1)
+                if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_l), 1)
             else:
                 if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
                 if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
@@ -161,20 +158,16 @@ class ShoulderP(Workouts):
         re= landmark[pos['right_elbow']].visibility >0
         return (lw,le,rw,re)
 
-
-    def run_sp(self, frame, landmarks, landmarks_np):
+    @classmethod
+    def run_sp(cls, frame, landmarks):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
-        pose_knn = self.pose_classifier(landmarks_np)
-        pose_predict = self.smoother(pose_knn)
 
-        if pose_predict['shoulder']>self._exit_threshold:
-            self.state = self.sp_count(landmarks.landmark, self.state)
+        if all(cls.validity(landmarks.landmark)):
+            cls.state = cls.sp_count(landmarks.landmark, cls.state)
         else:
             pass
 
-        frame = self.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
-
-
+        frame = cls.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
 
         return pose_predict
 
