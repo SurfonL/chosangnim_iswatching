@@ -44,8 +44,8 @@ class VideoProcessor:
             model_complexity=self.mod_comp, )
         self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
         self.rest_thresh = 10
-        self.ien = 6
-        self.iex = 4
+        self.ien = 5
+        self.iex = 3
         self.iw = 60
         self.ia = 0.1
         self.len = 6
@@ -68,7 +68,6 @@ class VideoProcessor:
             if not self.locked:
                 pose_knn = self.Stdp.pose_class(landmarks, self.top_n_mean, self.top_n_max)
                 self.pose_predict = self.smoother(pose_knn)
-                pose_frame = max(self.pose_predict, key=self.pose_predict.get)
                 self.smoother.set_rate(self.iw,self.ia)
 
                 frame, _ = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
