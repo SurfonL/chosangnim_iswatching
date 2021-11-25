@@ -1,49 +1,30 @@
 from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 
 class Workouts:
+    def __init__(self):
+        self._class_name = None
+        self._pose_samples_folder= None
 
-    _class_name = None
-    _pose_samples_folder= None
+        # If pose counter passes given threshold, then we enter the pose.
+        self._enter_threshold = 6
+        self._exit_threshold = 4
 
+        # Either we are in given pose or not.
+        self._pose_entered = False
 
-    # If pose counter passes given threshold, then we enter the pose.
-
-
-    _window = 50
-    _alpha = 0.001
-
-    _max_d = 30
-    _min_d = 10
-
-
-    # Either we are in given pose or not.
-    _pose_entered = False
-
-    # Number of times we exited the pose.
-    times = 0
-
-    csv_dir = None
+        # Number of times we exited the pose.
+        self.times = 0
 
 
-    pose_embedder = FullBodyPoseEmbedder()
+        self.pose_embedder = FullBodyPoseEmbedder()
+        self.pose_classifier = PoseClassifier(
+            pose_samples_folder=self._pose_samples_folder,
+            pose_embedder=self.pose_embedder,
+            top_n_by_max_distance=30,
+            top_n_by_mean_distance=10)
 
 
-    def init(cls, _pose_samples_folder):
-        cls.smoother = EMADictSmoothing(_pose_samples_folder,
-                                window_size=cls._window,
-                                     alpha=cls._alpha)
-        cls.pose_classifier = PoseClassifier(
-            pose_samples_folder=_pose_samples_folder,
-            pose_embedder=cls.pose_embedder,
-            top_n_by_max_distance=cls._max_d,
-            top_n_by_mean_distance=cls._min_d)
-
-
-    @classmethod
-    def count(cls, pose_predict):
-        print(pose_predict)
-        print(cls.times, '--------------------------------------------------------------')
-
+    def count(self, pose_classification):
         """Counts number of repetitions happend until given frame.
 
         We use two thresholds. First you need to go above the higher one to enter
@@ -62,37 +43,23 @@ class Workouts:
         Returns:
           Integer counter of repetitions.
         """
-
         # Get pose confidence.
         pose_confidence = 0.0
-        if cls._class_name in pose_predict:
-            pose_confidence = pose_predict[cls._class_name]
+        if self._class_name in pose_classification:
+            pose_confidence = pose_classification[self._class_name]
 
         # On the very first frame or if we were out of the pose, just check if we
         # entered it on this frame and update the state.
-        if not cls._pose_entered:
-            cls._pose_entered = pose_confidence > cls._enter_threshold
-            return cls.times
+        if not self._pose_entered:
+            self._pose_entered = pose_confidence > self._enter_threshold
+            return self.times
 
         # If we were in the pose and are exiting it, then increase the counter and
         # update the state.
-        if pose_confidence < cls._exit_threshold:
-            cls.times += 1
-            cls._pose_entered = False
+        if pose_confidence < self._exit_threshold:
+            self.times += 1
+            self._pose_entered = False
 
-
-
-    @classmethod
-    def set_thresh(cls,enter,exit):
-        cls._enter_threshold=enter
-        cls._exit_threshold=exit
-
-    @classmethod
-    def set_smooth(cls, win, alpha):
-        cls. _window = win
-        cls._alpha = alpha
-
-    @classmethod
-    def set_max_d(cls, win, alpha):
-        cls._window = win
-        cls._alpha = alpha
+    def set_thresh(self,enter,exit):
+        self._enter_threshold=enter
+        self._exit_threshold=exit

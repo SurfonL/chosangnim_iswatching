@@ -1,6 +1,7 @@
 import pandas as pd
 import time
 
+from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 import mediapipe as mp
 import cv2
 import numpy as np
@@ -9,6 +10,7 @@ class StandardProcess:
 
     def __init__(self, model_complexity):
         self.pose = mp.solutions.pose.Pose(model_complexity=model_complexity)
+
 
 
 
