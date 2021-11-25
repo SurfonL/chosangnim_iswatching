@@ -33,8 +33,9 @@ class StandardProcess:
     def pose_class(self, landmarks, n_min, n_max):
         landmarks_np = np.array([[lmk.x * self.frame_width, lmk.y * self.frame_height, lmk.z * self.frame_width]
                                  for lmk in landmarks.landmark], dtype=np.float32)
+        self.pose_classifier.set_minmaxn(n_min, n_max)
         pose_classification = self.pose_classifier(landmarks_np)
-        pose_classification.set_minmax(n_min,n_max)
+
 
         return pose_classification
 

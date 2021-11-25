@@ -192,7 +192,6 @@ def run():
                 """)
         debug = st.checkbox('Debug Mode')
         if debug:
-            #Todo: connect these
             mdl_cp = st.slider('model complexity', value=2, min_value=0, max_value=2)
             rest_thresh = st.slider('resting threshold', value = 5, min_value =1, max_value = 30)
 
