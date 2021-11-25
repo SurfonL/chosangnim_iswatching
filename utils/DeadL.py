@@ -9,6 +9,7 @@ class DeadL(Workouts):
 
     @classmethod
     def count(cls, pose_classification):
+        print(pose_classification,cls.times, '--------------------------------------')
         """Counts number of repetitions happend until given frame.
 
         We use two thresholds. First you need to go above the higher one to enter
