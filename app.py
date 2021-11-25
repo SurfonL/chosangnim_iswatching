@@ -213,6 +213,7 @@ def run():
             top_max_n = st.slider('top_n_max', value=70, min_value=10, max_value=150)
 
             color = st.color_picker('font color', value = '#ffffff')
+            color = color.lstrip('#')
 
     goal = st.select_slider('How many?', [i for i in range(0, 21)])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
