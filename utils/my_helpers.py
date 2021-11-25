@@ -27,7 +27,6 @@ class StandardProcess:
         landmarks = results.pose_landmarks
 
         self.frame_height, self.frame_width, _ = frame.shape
-
         return frame, landmarks, self.frame_height, self.frame_width
 
     def pose_class(self, landmarks, n_min, n_max):

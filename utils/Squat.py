@@ -38,7 +38,7 @@ class Squat:
        Returns:
          Integer counter of repetitions.
        """
-       print(pose_classification)
+
        # Get pose confidence.
        pose_confidence = 0.0
        if cls._class_name in pose_classification:
@@ -70,7 +70,7 @@ class Squat:
         cls.smoother.set_rate(win, a)
 
     @classmethod
-    def draw_circle(frame, pose_predict, landmarks):
+    def draw_circle(cls, frame, pose_predict, landmarks):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
         right_hip = landmarks.landmark[23]
         left_hip = landmarks.landmark[24]
@@ -101,8 +101,12 @@ class Squat:
             pose_classification = cls.pose_classifier(landmarks_np)
             pose_predict = cls.smoother(pose_classification)
 
+            frame = cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
+        # else:
+        #     frame = drawing.annotation(frame, landmarks)
+
         cls.count(pose_predict)
-        frame = cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
+
 
         # draw things
         # frame = draw_bp(frame)

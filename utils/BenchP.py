@@ -1,3 +1,4 @@
+from utils.Workouts import Workouts
 from utils.Drawing import drawing
 import numpy as np
 from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
@@ -16,7 +17,7 @@ class BenchP:
         top_n_by_max_distance=30,
         top_n_by_mean_distance=10)
     smoother = EMADictSmoothing('utils/pose_plots/bench')
-    
+
     @classmethod
     def count(cls, pose_classification):
         """Counts number of repetitions happend until given frame.
@@ -58,7 +59,7 @@ class BenchP:
     def set_thresh(cls,enter,exit):
         cls._enter_threshold=enter
         cls._exit_threshold=exit
-    
+
     @classmethod
     def set_param(cls, enter, exit, win ,a):
         cls._enter_threshold = enter
@@ -71,14 +72,16 @@ class BenchP:
         right_elbow = landmarks.landmark[13]
         left_elbow = landmarks.landmark[14]
         if pose_predict > cls._enter_threshold:
-            frame = drawing.image_alpha(frame, right_elbow.x * frame_width, right_elbow.y * frame_height, 30, (0, 255, 0),
+            frame = drawing.image_alpha(frame, right_elbow.x * frame_width, right_elbow.y * frame_height, 30,
+                                        (0, 255, 0),
                                         0.3,
                                         1, 1)
             frame = drawing.image_alpha(frame, left_elbow.x * frame_width, left_elbow.y * frame_height, 30, (0, 255, 0),
                                         0.3, 1,
                                         1)
         elif pose_predict > cls._exit_threshold:
-            frame = drawing.image_alpha(frame, right_elbow.x * frame_width, right_elbow.y * frame_height, 30, (0, 255, 0),
+            frame = drawing.image_alpha(frame, right_elbow.x * frame_width, right_elbow.y * frame_height, 30,
+                                        (0, 255, 0),
                                         0.3, pose_predict - cls._exit_threshold,
                                         cls._enter_threshold - cls._exit_threshold)
             frame = drawing.image_alpha(frame, left_elbow.x * frame_width, left_elbow.y * frame_height, 30, (0, 255, 0),
@@ -88,7 +91,8 @@ class BenchP:
             frame = drawing.image_alpha(frame, right_elbow.x * frame_width, right_elbow.y * frame_height, 30,
                                         (255, 255, 255),
                                         0.3, 1, 1, fill=False)
-            frame = drawing.image_alpha(frame, left_elbow.x * frame_width, left_elbow.y * frame_height, 30, (255, 255, 255),
+            frame = drawing.image_alpha(frame, left_elbow.x * frame_width, left_elbow.y * frame_height, 30,
+                                        (255, 255, 255),
                                         0.3, 1, 1, fill=False)
         return frame
 
@@ -101,10 +105,15 @@ class BenchP:
             pose_classification = cls.pose_classifier(landmarks_np)
             pose_predict = cls.smoother(pose_classification)
 
+            frame = cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
+
+        # else:
+        #     frame = drawing.annotation(frame, landmarks)
+
         cls.count(pose_predict)
-        frame = cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
-        #draw things
-        #frame = draw_bp(frame)
+
+        # draw things
+        # frame = draw_bp(frame)
 
         return frame, pose_predict
 
