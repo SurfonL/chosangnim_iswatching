@@ -43,9 +43,11 @@ class VideoProcessor:
         self.Stdp = StandardProcess(
             model_complexity=self.mod_comp, )
         self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
+
         self.rest_thresh = 10
         self.ien = 5
         self.iex = 3
+
         self.iw = 60
         self.ia = 0.1
         self.len = 6
