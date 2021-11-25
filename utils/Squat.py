@@ -60,6 +60,12 @@ class Squat:
         cls._enter_threshold = enter
         cls._exit_threshold = exit
 
+    @classmethod
+    def set_param(cls, enter, exit, win ,a):
+        cls._enter_threshold = enter
+        cls._exit_threshold = exit
+        cls.smoother.set_rate(win, a)
+
 
     @staticmethod
     def draw_circle(frame, landmarks):

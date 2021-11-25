@@ -19,6 +19,7 @@ class DeadL:
 
     @classmethod
     def count(cls, pose_classification):
+        print(pose_classification)
         """Counts number of repetitions happend until given frame.
 
         We use two thresholds. First you need to go above the higher one to enter
@@ -58,6 +59,12 @@ class DeadL:
     def set_thresh(cls, enter, exit):
         cls._enter_threshold = enter
         cls._exit_threshold = exit
+
+    @classmethod
+    def set_param(cls, enter, exit, win ,a):
+        cls._enter_threshold = enter
+        cls._exit_threshold = exit
+        cls.smoother.set_rate(win, a)
     
     @classmethod
     def run_dl(cls, frame, pose_predict, landmarks, locked=False):

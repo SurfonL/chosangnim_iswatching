@@ -167,6 +167,12 @@ class ShoulderP:
         return (lw,le,rw,re)
 
     @classmethod
+    def set_param(cls, enter, exit, win ,a):
+        cls._enter_threshold = enter
+        cls._exit_threshold = exit
+        cls.smoother.set_rate(win, a)
+
+    @classmethod
     def run_sp(cls, frame, pose_predict, landmarks, locked = False):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
         if locked:

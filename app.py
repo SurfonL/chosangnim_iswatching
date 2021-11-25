@@ -44,13 +44,13 @@ class VideoProcessor:
             model_complexity=self.mod_comp, )
         self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
         self.rest_thresh = 5
-        self.ien = 4
-        self.iex = 6
+        self.ien = 6
+        self.iex = 4
         self.iw = 60
         self.ia = 0.05
-
-
-        self.lw = 10
+        self.len = 7
+        self.lex = 3
+        self.lw = 30
         self.la = 0.1
 
         self.top_n_mean = 10
@@ -79,7 +79,7 @@ class VideoProcessor:
                 elif pose_frame == 'bench':
                     frame, _ = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
                     BenchP.set_thresh(self.ien, self.iex)
-                elif pose_frame == 'dead':
+                elif pose_frame == 'deadlift':
                     frame, _ = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
                     DeadL.set_thresh(self.ien, self.iex)
 
@@ -87,11 +87,12 @@ class VideoProcessor:
                 #locked
                 if self.pose_state == 'shoulder':
                     frame, l_pp = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
+                    ShoulderP.set_param(self.len,self.lex,self.lw,self.la)
                 elif self.pose_state == 'squat':
                     frame, l_pp = Squat.run_sq(frame, self.pose_predict, landmarks, self.locked)
                 elif self.pose_state == 'bench':
                     frame, l_pp = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
-                elif self.pose_state == 'dead':
+                elif self.pose_state == 'deadlift':
                     frame, l_pp = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
                 self.pose_predict = self.smoother(l_pp)
 
@@ -149,7 +150,7 @@ class VideoProcessor:
                 #현 프레임 운동중, 현 pose_state 운동중
                 if np.max(counts):
                     if self.pose_state != 'resting':
-                        self.pose_state = ['shoulder', 'squat', 'bench', 'dead'][np.argmax(counts)]
+                        self.pose_state = ['shoulder', 'squat', 'bench', 'deadlift'][np.argmax(counts)]
                         self.locked = True
                     else:
                         self.locked = False
@@ -204,10 +205,10 @@ def run():
             iew = col1.slider('initial ema window', value=60, min_value=0, max_value=300)
             iea = col1.slider('initial ema alpha', value=0.1, min_value=float(0), max_value=float(1))
 
-            lns = col2.slider('locked enter sensitivity', value=5.0, min_value=float(0), max_value=float(10))
-            lxs = col2.slider('locked exit sensitivity', value=6.0, min_value=float(0), max_value=float(10))
-            lew = col2.slider('locked ema window', value=10, min_value=0, max_value=100)
-            lea = col2.slider('locked ema alpha', value=0.2, min_value=float(0), max_value=float(1))
+            lns = col2.slider('locked enter sensitivity', value=3.0, min_value=float(0), max_value=float(10))
+            lxs = col2.slider('locked exit sensitivity', value=7.0, min_value=float(0), max_value=float(10))
+            lew = col2.slider('locked ema window', value=30, min_value=0, max_value=100)
+            lea = col2.slider('locked ema alpha', value=0.1, min_value=float(0), max_value=float(1))
 
             top_mean_n = st.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
             top_max_n = st.slider('top_n_max', value=70, min_value=10, max_value=150)
@@ -228,6 +229,10 @@ def run():
         ctx.video_processor.iex = ixs
         ctx.video_processor.iw = iew
         ctx.video_processor.ia= iea
+        ctx.video_processor.len = lns
+        ctx.video_processor.lex = lxs
+        ctx.video_processor.lw = lew
+        ctx.video_processor.la = lea
         ctx.video_processor.mod_comp = mdl_cp
 
         ctx.video_processor.top_n_mean = top_mean_n
