@@ -232,7 +232,7 @@ def run():
 
         ctx.video_processor.top_n_mean = top_mean_n
         ctx.video_processor.top_n_max = top_max_n
-
+        print(color, tuple(int(color[i:i+2], 16) for i in (0, 2, 4)))
         ctx.video_processor.font_color = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
 
 
