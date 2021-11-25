@@ -73,13 +73,13 @@ class VideoProcessor:
 
                 if pose_frame == 'shoulder':
                     frame, _ = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
-                elif pose_frame == 'squat_down':
+                elif pose_frame == 'squat':
                     frame, _ = Squat.run_sq(frame,self.pose_predict, landmarks, self.locked)
                     Squat.set_thresh(self.ien, self.iex)
-                elif pose_frame == 'bench_down':
+                elif pose_frame == 'bench':
                     frame, _ = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
                     BenchP.set_thresh(self.ien, self.iex)
-                elif pose_frame == 'dead_down':
+                elif pose_frame == 'dead':
                     frame, _ = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
                     DeadL.set_thresh(self.ien, self.iex)
 
@@ -87,11 +87,11 @@ class VideoProcessor:
                 #locked
                 if self.pose_state == 'shoulder':
                     frame, l_pp = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
-                elif self.pose_state == 'squat_down':
+                elif self.pose_state == 'squat':
                     frame, l_pp = Squat.run_sq(frame, self.pose_predict, landmarks, self.locked)
-                elif self.pose_state == 'bench_down':
+                elif self.pose_state == 'bench':
                     frame, l_pp = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
-                elif self.pose_state == 'dead_down':
+                elif self.pose_state == 'dead':
                     frame, l_pp = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
                 self.pose_predict = self.smoother(l_pp)
 
@@ -149,7 +149,7 @@ class VideoProcessor:
                 #현 프레임 운동중, 현 pose_state 운동중
                 if np.max(counts):
                     if self.pose_state != 'resting':
-                        self.pose_state = ['shoulder', 'squat_down', 'bench_down', 'dead_down'][np.argmax(counts)]
+                        self.pose_state = ['shoulder', 'squat', 'bench', 'dead'][np.argmax(counts)]
                         self.locked = True
                     else:
                         self.locked = False

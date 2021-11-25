@@ -3,7 +3,7 @@ from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmooth
 
 
 class DeadL:
-    _class_name = 'dead_down'
+    _class_name = 'deadlift'
     times = 0
     _pose_entered = False
     _enter_threshold = 6

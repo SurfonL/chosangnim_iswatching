@@ -4,7 +4,7 @@ import numpy as np
 
 
 class Squat:
-    _class_name = 'squat_down'
+    _class_name = 'squat'
     times = 0
     _pose_entered = False
     _enter_threshold = 6

@@ -3,7 +3,7 @@ from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmooth
 
 
 class BenchP:
-    _class_name = 'bench_down'
+    _class_name = 'bench'
     times = 0
     _pose_entered = False
     _enter_threshold = 6
