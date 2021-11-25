@@ -71,17 +71,13 @@ class VideoProcessor:
                 pose_frame = max(self.pose_predict, key=self.pose_predict.get)
                 self.smoother.set_rate(self.iw,self.ia)
 
-                if pose_frame == 'shoulder':
-                    frame, _ = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
-                elif pose_frame == 'squat':
-                    frame, _ = Squat.run_sq(frame,self.pose_predict, landmarks, self.locked)
-                    Squat.set_thresh(self.ien, self.iex)
-                elif pose_frame == 'bench':
-                    frame, _ = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
-                    BenchP.set_thresh(self.ien, self.iex)
-                elif pose_frame == 'deadlift':
-                    frame, _ = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
-                    DeadL.set_thresh(self.ien, self.iex)
+                frame, _ = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
+                frame, _ = Squat.run_sq(frame,self.pose_predict, landmarks, self.locked)
+                Squat.set_thresh(self.ien, self.iex)
+                frame, _ = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
+                BenchP.set_thresh(self.ien, self.iex)
+                frame, _ = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
+                DeadL.set_thresh(self.ien, self.iex)
 
             else:
                 #locked
