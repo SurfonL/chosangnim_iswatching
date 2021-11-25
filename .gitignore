@@ -10,3 +10,4 @@ utils/*.mp4
 *.csv
 *.txt
 *_test.py
+*.pkl

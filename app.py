@@ -1,4 +1,3 @@
-import pandas as pd
 from streamlit_webrtc import webrtc_streamer, WebRtcMode
 import streamlit as st
 import time
@@ -65,10 +64,10 @@ class VideoProcessor:
             landmarks_np = np.array([[lmk.x * width, lmk.y * height, lmk.z * width]
                                      for lmk in landmarks.landmark], dtype=np.float32)
 
-            shp = self.Shoulder.run_sp(frame, landmarks, landmarks_np) if not self.count or self.switch == 0 else {'shoulder':0}
-            sqp = self.Squat.run_sq(frame, landmarks, landmarks_np) if not self.count or self.switch ==1 else {'squat':0}
-            bpp = self.Bench.run_bp(frame, landmarks, landmarks_np) if not self.count or self.switch ==2 else {'bench':0}
-            dlp = self.Dead.run_dl(frame, landmarks, landmarks_np) if not self.count or self.switch ==3 else {'deadlift':0}
+            shp = self.Shoulder.run_sp(frame, landmarks, landmarks_np) if self.pose_state == 'resting' or self.switch == 0 else {'shoulder':0}
+            sqp = self.Squat.run_sq(frame, landmarks, landmarks_np) if self.pose_state == 'resting' or self.switch ==1 else {'squat':0}
+            bpp = self.Bench.run_bp(frame, landmarks, landmarks_np) if self.pose_state == 'resting' or self.switch ==2 else {'bench':0}
+            dlp = self.Dead.run_dl(frame, landmarks, landmarks_np) if self.pose_state == 'resting' or self.switch ==3 else {'deadlift':0}
             #debug mode
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame
             pose_predict = {**shp, **sqp, **bpp, **dlp}
@@ -80,6 +79,7 @@ class VideoProcessor:
             pass
 
         counts = [self.Shoulder.times, self.Squat.times, self.Bench.times, self.Dead.times]
+        print(pose_predict)
 
         res = pose_predict.pop('resting')
         if pose_predict:

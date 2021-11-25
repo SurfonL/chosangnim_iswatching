@@ -10,7 +10,7 @@ class Workouts:
 
 
     _window = 50
-    _alpha = 0.005
+    _alpha = 0.001
 
     _max_d = 30
     _min_d = 10
