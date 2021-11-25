@@ -1,3 +1,4 @@
+from utils.Workouts import Workouts
 from utils.Drawing import drawing
 import numpy as np
 from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
@@ -20,7 +21,6 @@ class DeadL:
 
     @classmethod
     def count(cls, pose_classification):
-        print(pose_classification)
         """Counts number of repetitions happend until given frame.
 
         We use two thresholds. First you need to go above the higher one to enter
@@ -60,7 +60,7 @@ class DeadL:
     def set_thresh(cls, enter, exit):
         cls._enter_threshold = enter
         cls._exit_threshold = exit
-    
+
     @classmethod
     def set_param(cls, enter, exit, win ,a):
         cls._enter_threshold = enter
@@ -103,9 +103,13 @@ class DeadL:
                                      for lmk in landmarks.landmark], dtype=np.float32)
             pose_classification = cls.pose_classifier(landmarks_np)
             pose_predict = cls.smoother(pose_classification)
-            
+
+            frame = cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
+
+        # else:
+        #     frame = drawing.annotation(frame, landmarks)
         cls.count(pose_predict)
-        frame = cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
+
 
         # draw things
         # frame = draw_bp(frame)

@@ -10,6 +10,7 @@ from utils.BenchP import BenchP
 from utils.DeadL import DeadL
 from utils.my_helpers import StandardProcess, print_count, workout_row, draw_landmarks
 from utils.KnnClassif import EMADictSmoothing
+from utils.Drawing import drawing
 import random
 import numpy as np
 import pandas as pd
@@ -79,6 +80,7 @@ class VideoProcessor:
                 BenchP.set_thresh(self.ien, self.iex)
                 frame, _ = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
                 DeadL.set_thresh(self.ien, self.iex)
+                drawing.annotation(frame, landmarks)
 
             else:
                 #locked

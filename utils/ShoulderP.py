@@ -182,12 +182,17 @@ class ShoulderP:
             pose_classification = cls.pose_classifier(landmarks_np)
             pose_predict = cls.smoother(pose_classification)
 
+            frame = cls.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
+
+        # else:
+        #     frame = drawing.annotation(frame, landmarks)
+
         if all(cls.validity(landmarks.landmark)):
             cls.state = cls.sp_count(landmarks.landmark, cls.state)
         else:
             pass
 
-        frame = cls.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
+
 
 
         return frame, pose_predict
