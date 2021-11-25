@@ -20,6 +20,7 @@ class Squat:
 
     @classmethod
     def count(cls, pose_classification):
+
        """Counts number of repetitions happend until given frame.
 
        We use two thresholds. First you need to go above the higher one to enter
@@ -38,6 +39,7 @@ class Squat:
        Returns:
          Integer counter of repetitions.
        """
+       print(pose_classification)
        # Get pose confidence.
        pose_confidence = 0.0
        if cls._class_name in pose_classification:

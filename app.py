@@ -90,10 +90,13 @@ class VideoProcessor:
                     ShoulderP.set_param(self.len,self.lex,self.lw,self.la)
                 elif self.pose_state == 'squat':
                     frame, l_pp = Squat.run_sq(frame, self.pose_predict, landmarks, self.locked)
+                    Squat.set_param(self.len, self.lex, self.lw, self.la)
                 elif self.pose_state == 'bench':
                     frame, l_pp = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
+                    BenchP.set_param(self.len, self.lex, self.lw, self.la)
                 elif self.pose_state == 'deadlift':
                     frame, l_pp = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
+                    DeadL.set_param(self.len, self.lex, self.lw, self.la)
                 self.pose_predict = self.smoother(l_pp)
 
             #plot sticks if debug
