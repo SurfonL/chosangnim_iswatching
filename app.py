@@ -43,15 +43,15 @@ class VideoProcessor:
         self.Stdp = StandardProcess(
             model_complexity=self.mod_comp, )
         self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
-        self.rest_thresh = 5
+        self.rest_thresh = 10
         self.ien = 6
         self.iex = 4
         self.iw = 60
-        self.ia = 0.05
-        self.len = 7
-        self.lex = 3
+        self.ia = 0.1
+        self.len = 6
+        self.lex = 4
         self.lw = 30
-        self.la = 0.1
+        self.la = 0.3
 
         self.top_n_mean = 10
         self.top_n_max = 30
@@ -204,10 +204,10 @@ def run():
             iew = col1.slider('initial ema window', value=60, min_value=0, max_value=300)
             iea = col1.slider('initial ema alpha', value=0.1, min_value=float(0), max_value=float(1))
 
-            lns = col2.slider('locked enter sensitivity', value=7.0, min_value=float(0), max_value=float(10))
-            lxs = col2.slider('locked exit sensitivity', value=3.0, min_value=float(0), max_value=float(10))
+            lns = col2.slider('locked enter sensitivity', value=6.0, min_value=float(0), max_value=float(10))
+            lxs = col2.slider('locked exit sensitivity', value=4.0, min_value=float(0), max_value=float(10))
             lew = col2.slider('locked ema window', value=30, min_value=0, max_value=100)
-            lea = col2.slider('locked ema alpha', value=0.1, min_value=float(0), max_value=float(1))
+            lea = col2.slider('locked ema alpha', value=0.3, min_value=float(0), max_value=float(1))
 
             top_mean_n = st.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
             top_max_n = st.slider('top_n_max', value=70, min_value=10, max_value=100)
