@@ -211,7 +211,7 @@ def run():
             lea = col2.slider('locked ema alpha', value=0.1, min_value=float(0), max_value=float(1))
 
             top_mean_n = st.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
-            top_max_n = st.slider('top_n_max', value=70, min_value=10, max_value=150)
+            top_max_n = st.slider('top_n_max', value=70, min_value=10, max_value=100)
 
 
 
