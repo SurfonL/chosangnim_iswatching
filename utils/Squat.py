@@ -1,16 +1,25 @@
 from utils.Drawing import drawing
-import cv2
+from utils.KnnClassif import FullBodyPoseEmbedder,PoseClassifier, EMADictSmoothing
 import numpy as np
 
 class Squat:
-    _class_name = 'squat_down'
+    _class_name = 'squat'
     times = 0
     _pose_entered = False
     _enter_threshold = 6
     _exit_threshold = 4
 
+    pose_embedder = FullBodyPoseEmbedder()
+    pose_classifier = PoseClassifier(
+        pose_samples_folder='utils/pose_plots/squat',
+        pose_embedder=pose_embedder,
+        top_n_by_max_distance=30,
+        top_n_by_mean_distance=10)
+    smoother = EMADictSmoothing('utils/pose_plots/squat')
+
     @classmethod
     def count(cls, pose_classification):
+
        """Counts number of repetitions happend until given frame.
 
        We use two thresholds. First you need to go above the higher one to enter
@@ -29,6 +38,7 @@ class Squat:
        Returns:
          Integer counter of repetitions.
        """
+       print(pose_classification)
        # Get pose confidence.
        pose_confidence = 0.0
        if cls._class_name in pose_classification:
@@ -54,7 +64,13 @@ class Squat:
         cls._exit_threshold = exit
 
     @classmethod
-    def draw_circle(cls, frame, pose_predict, landmarks):
+    def set_param(cls, enter, exit, win ,a):
+        cls._enter_threshold = enter
+        cls._exit_threshold = exit
+        cls.smoother.set_rate(win, a)
+
+    @classmethod
+    def draw_circle(frame, pose_predict, landmarks):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
         right_hip = landmarks.landmark[23]
         left_hip = landmarks.landmark[24]
@@ -77,12 +93,19 @@ class Squat:
         return frame
 
     @classmethod
-    def run_sq(cls, frame, pose_predict, landmarks):
+    def run_sq(cls, frame, pose_predict, landmarks, locked=False):
+        if locked:
+            frame_height, frame_width = frame.shape[0], frame.shape[1]
+            landmarks_np = np.array([[lmk.x * frame_width, lmk.y * frame_height, lmk.z * frame_width]
+                                     for lmk in landmarks.landmark], dtype=np.float32)
+            pose_classification = cls.pose_classifier(landmarks_np)
+            pose_predict = cls.smoother(pose_classification)
+
         cls.count(pose_predict)
         frame = cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
 
         # draw things
         # frame = draw_bp(frame)
 
-        return frame, cls.times
+        return frame, pose_predict
 

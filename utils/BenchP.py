@@ -1,12 +1,21 @@
-from utils.Workouts import Workouts
 from utils.Drawing import drawing
+import numpy as np
+from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 
 class BenchP:
-    _class_name = 'bench_down'
+    _class_name = 'bench'
     times = 0
     _pose_entered = False
     _enter_threshold = 6
     _exit_threshold = 4
+
+    pose_embedder = FullBodyPoseEmbedder()
+    pose_classifier = PoseClassifier(
+        pose_samples_folder='utils/pose_plots/bench',
+        pose_embedder=pose_embedder,
+        top_n_by_max_distance=30,
+        top_n_by_mean_distance=10)
+    smoother = EMADictSmoothing('utils/pose_plots/bench')
     
     @classmethod
     def count(cls, pose_classification):
@@ -49,6 +58,12 @@ class BenchP:
     def set_thresh(cls,enter,exit):
         cls._enter_threshold=enter
         cls._exit_threshold=exit
+    
+    @classmethod
+    def set_param(cls, enter, exit, win ,a):
+        cls._enter_threshold = enter
+        cls._exit_threshold = exit
+        cls.smoother.set_rate(win, a)
 
     @classmethod
     def draw_circle(cls, frame, pose_predict, landmarks):
@@ -78,12 +93,18 @@ class BenchP:
         return frame
 
     @classmethod
-    def run_bp(cls, frame, pose_predict, landmarks):
+    def run_bp(cls,frame,pose_predict, landmarks, locked=False):
+        if locked:
+            frame_height, frame_width = frame.shape[0], frame.shape[1]
+            landmarks_np = np.array([[lmk.x * frame_width, lmk.y * frame_height, lmk.z * frame_width]
+                                     for lmk in landmarks.landmark], dtype=np.float32)
+            pose_classification = cls.pose_classifier(landmarks_np)
+            pose_predict = cls.smoother(pose_classification)
+
         cls.count(pose_predict)
         frame = cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
         #draw things
         #frame = draw_bp(frame)
 
-        return frame, cls.times
-
+        return frame, pose_predict
 
