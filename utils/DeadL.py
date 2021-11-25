@@ -1,7 +1,7 @@
 from utils.Workouts import Workouts
 
 class DeadL(Workouts):
-    _class_name = 'bench_down'
+    _class_name = 'dead_down'
     times = 0
     _pose_entered = False
     _enter_threshold = 6
