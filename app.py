@@ -44,7 +44,7 @@ class VideoProcessor:
             model_complexity=self.mod_comp, )
         self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
         self.rest_thresh = 5
-        self.ien = 5
+        self.ien = 4
         self.iex = 6
         self.iw = 60
         self.ia = 0.05
@@ -196,7 +196,7 @@ def run():
             rest_thresh = st.slider('resting threshold', value = 5, min_value =1, max_value = 30)
 
             col1, col2 = st.columns(2)
-            ins = col1.slider('initial enter sensitivity', value=5.0, min_value=float(0), max_value=float(10))
+            ins = col1.slider('initial enter sensitivity', value=4.0, min_value=float(0), max_value=float(10))
             ixs = col1.slider('initial exit sensitivity', value=6.0, min_value=float(0), max_value=float(10))
             iew = col1.slider('initial ema window', value=60, min_value=0, max_value=300)
             iea = col1.slider('initial ema alpha', value=0.1, min_value=float(0), max_value=float(1))
