@@ -20,10 +20,6 @@ rn = round(random.random(),5)
 
 class VideoProcessor:
     def __init__(self):
-        self.Stdp = StandardProcess(
-            model_complexity = 0,)
-
-
         self.result_queue = queue.Queue()
         self.locked = False
         self.pose_args = 0
@@ -34,16 +30,24 @@ class VideoProcessor:
         self.count = 0
         self.count_rec = 0
         self.set_no = 0
-        self.goal = 0
-
-        self.rest_thresh = 5
         self.r_time = 0
         self.w_time = 0
         self.table = pd.DataFrame()
         self.resting_time = 0
         self.workout_time = 0
 
+
         self.debug = False
+        self.goal = 0
+        self.mod_comp = 2
+        self.Stdp = StandardProcess(
+            model_complexity=self.mod_comp, )
+        self.rest_thresh = 5
+        self.ien = 5
+        self.iex = 6
+        self.iw = 60
+        self.ia = 0.05
+
 
 
 
@@ -58,20 +62,19 @@ class VideoProcessor:
             pose_prob = pose_predict[pose_frame]
 
             if not self.locked:
-                self.smoother.set_rate(60,0.1)
-                en = 5
-                ex = 6
+                self.smoother.set_rate(self.iw,self.ia)
+
                 if pose_frame == 'shoulder':
                     frame, self.count = ShoulderP.run_shoulderp(frame,landmarks)
                 elif pose_frame == 'squat_down':
                     frame, self.count = Squat.run_sq(frame,pose_predict, landmarks)
-                    Squat.set_thresh(en,ex)
+                    Squat.set_thresh(self.ien, self.iex)
                 elif pose_frame == 'bench_down':
                     frame, self.count = BenchP.run_bp(frame, pose_predict, landmarks)
-                    BenchP.set_thresh(en,ex)
+                    BenchP.set_thresh(self.ien, self.iex)
                 elif pose_frame == 'dead_down':
                     frame, self.count = DeadL.run_dl(frame, pose_predict, landmarks)
-                    DeadL.set_thresh(en, ex)
+                    DeadL.set_thresh(self.ien, self.iex)
 
             else:
                 #locked
@@ -206,6 +209,12 @@ def run():
     if ctx.video_processor:
         ctx.video_processor.goal = goal
         ctx.video_processor.debug = debug
+        ctx.video_processor.mod_comp = mdl_cp
+        ctx.video_processor.rest_thresh = rest_thresh
+        ctx.video_processor.ien = ins
+        ctx.video_processor.iex = ixs
+
+
 
 
     result = pd.DataFrame()

@@ -60,6 +60,7 @@ class Workouts:
             self.times += 1
             self._pose_entered = False
 
-    def set_thresh(self,enter,exit):
+    @classmethod
+    def set_thresh(cls,enter,exit):
         self._enter_threshold=enter
         self._exit_threshold=exit
