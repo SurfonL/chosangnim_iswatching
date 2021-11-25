@@ -56,6 +56,8 @@ class VideoProcessor:
         self.top_n_mean = 10
         self.top_n_max = 30
 
+        self.font_color = (255,255,255)
+
 
 
 
@@ -165,7 +167,8 @@ class VideoProcessor:
                             self.count, self.goal,
                             str(pos), str(round(pose_predict[pos]*10)),
                             self.w_time, self.r_time,self.rest_thresh,
-                            self.debug)
+                            self.debug,
+                            self.font_color)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 
@@ -209,6 +212,7 @@ def run():
             top_mean_n = st.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
             top_max_n = st.slider('top_n_max', value=70, min_value=10, max_value=150)
 
+            color = st.color_picker('font color', value = '#ffffff')
 
     goal = st.select_slider('How many?', [i for i in range(0, 21)])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
@@ -228,6 +232,8 @@ def run():
 
         ctx.video_processor.top_n_mean = top_mean_n
         ctx.video_processor.top_n_max = top_max_n
+
+        ctx.video_processor.font_color = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
 
 
 

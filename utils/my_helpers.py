@@ -39,7 +39,7 @@ class StandardProcess:
 
         return pose_classification
 
-def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,rest_thresh, debug=True):
+def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,rest_thresh, font_color, debug=True):
 
     if pose == 'bench':
         pose = 'bench press'
@@ -53,13 +53,13 @@ def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,
     f_thick = int(f_size * 1.5)
     t_size, t_y = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
     frame = cv2.putText(frame, text, (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15)),
-                        cv2.FONT_HERSHEY_SIMPLEX, f_size, (255, 255, 255), f_thick)
+                        cv2.FONT_HERSHEY_SIMPLEX, f_size, font_color, f_thick)
 
     f_size = height/400
     f_thick = f_thick -1
     t_size, t_y2 = cv2.getTextSize(pose, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
     frame = cv2.putText(frame, pose, (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15) +t_y*3),
-                        cv2.FONT_HERSHEY_SIMPLEX, f_size, (255, 255, 255), f_thick)
+                        cv2.FONT_HERSHEY_SIMPLEX, f_size, font_color, f_thick)
 
     now = time.time()
     if pose == 'resting':
@@ -71,7 +71,7 @@ def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,
     f_thick = f_thick -1
     t_size, _ = cv2.getTextSize(t, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
     frame = cv2.putText(frame, t, (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15) +t_y*3+t_y2*4),
-                        cv2.FONT_HERSHEY_SIMPLEX, f_size, (255, 255, 255), f_thick)
+                        cv2.FONT_HERSHEY_SIMPLEX, f_size, font_color, f_thick)
 
     if debug:
         f_size = height / 600
@@ -79,7 +79,7 @@ def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,
         t_size, _ = cv2.getTextSize(pose_prob, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
         frame = cv2.putText(frame, pose_prob,
                             (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15) + t_y * 3 + t_y2*7),
-                            cv2.FONT_HERSHEY_SIMPLEX, f_size, (255, 255, 255), f_thick)
+                            cv2.FONT_HERSHEY_SIMPLEX, f_size, font_color, f_thick)
 
     return frame
 
