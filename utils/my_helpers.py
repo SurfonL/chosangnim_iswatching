@@ -39,8 +39,8 @@ class StandardProcess:
 
         return pose_classification
 
-def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,rest_thresh, font_color, debug=True):
-
+def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,rest_thresh, debug=True):
+    font_color = (0,0,0)
     if pose == 'bench':
         pose = 'bench press'
 

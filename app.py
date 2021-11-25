@@ -212,8 +212,7 @@ def run():
             top_mean_n = st.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
             top_max_n = st.slider('top_n_max', value=70, min_value=10, max_value=150)
 
-            color = st.color_picker('font color', value = '#ffffff')
-            color = color.lstrip('#')
+
 
     goal = st.select_slider('How many?', [i for i in range(0, 21)])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
@@ -233,8 +232,6 @@ def run():
 
         ctx.video_processor.top_n_mean = top_mean_n
         ctx.video_processor.top_n_max = top_max_n
-        print(color, tuple(int(color[i:i+2], 16) for i in (0, 2, 4)))
-        ctx.video_processor.font_color = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
 
 
 
