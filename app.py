@@ -216,16 +216,15 @@ def run():
 
     labels_placeholder = st.empty()
 
-    if ctx.video_processor:
+    if ctx.video_processor and debug:
         ctx.video_processor.goal = goal
         ctx.video_processor.debug = debug
-        ctx.video_processor.mod_comp = mdl_cp
         ctx.video_processor.rest_thresh = rest_thresh
         ctx.video_processor.ien = ins
         ctx.video_processor.iex = ixs
         ctx.video_processor.iw = iew
         ctx.video_processor.ia= iea
-
+        ctx.video_processor.mod_comp = mdl_cp
 
         ctx.video_processor.top_n_mean = top_mean_n
         ctx.video_processor.top_n_max = top_max_n

@@ -169,5 +169,4 @@ class ShoulderP:
 
         frame = cls.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
 
-        return pose_predict
-
+        return frame, cls.times
