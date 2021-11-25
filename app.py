@@ -67,41 +67,41 @@ class VideoProcessor:
         if landmarks is not None:
             if not self.locked:
                 pose_knn = self.Stdp.pose_class(landmarks, self.top_n_mean, self.top_n_max)
-                pose_predict = self.smoother(pose_knn)
-                pose_frame = max(pose_predict, key=pose_predict.get)
+                self.pose_predict = self.smoother(pose_knn)
+                pose_frame = max(self.pose_predict, key=self.pose_predict.get)
                 self.smoother.set_rate(self.iw,self.ia)
 
                 if pose_frame == 'shoulder':
-                    frame = ShoulderP.run_sp(frame,landmarks)
+                    frame, _ = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
                 elif pose_frame == 'squat_down':
-                    frame = Squat.run_sq(frame,pose_predict, landmarks, self.locked)
+                    frame, _ = Squat.run_sq(frame,self.pose_predict, landmarks, self.locked)
                     Squat.set_thresh(self.ien, self.iex)
                 elif pose_frame == 'bench_down':
-                    frame = BenchP.run_bp(frame, pose_predict, landmarks, self.locked)
+                    frame, _ = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
                     BenchP.set_thresh(self.ien, self.iex)
                 elif pose_frame == 'dead_down':
-                    frame = DeadL.run_dl(frame, pose_predict, landmarks, self.locked)
+                    frame, _ = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
                     DeadL.set_thresh(self.ien, self.iex)
 
             else:
-                #locked #TODO: 여기만 binary? ㅋㅋㅋㅋㅋㅋㅋ
-                self.smoother.set_rate(self.lw,self.la)
+                #locked
                 if self.pose_state == 'shoulder':
-                    frame = ShoulderP.run_sp(frame, landmarks)
+                    frame, l_pp = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
                 elif self.pose_state == 'squat_down':
-                    frame = Squat.run_sq(frame, pose_predict, landmarks, self.locked)
+                    frame, l_pp = Squat.run_sq(frame, self.pose_predict, landmarks, self.locked)
                 elif self.pose_state == 'bench_down':
-                    frame = BenchP.run_bp(frame, pose_predict, landmarks, self.locked)
+                    frame, l_pp = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
                 elif self.pose_state == 'dead_down':
-                    frame = DeadL.run_dl(frame, pose_predict, landmarks, self.locked)
+                    frame, l_pp = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
+                self.pose_predict = self.smoother(l_pp)
 
-
+            #plot sticks if debug
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame
 
         else:
-            pose_predict = self.smoother({'resting':10})
-            pose_frame = max(pose_predict, key=pose_predict.get)
+            self.pose_predict = self.smoother({'resting':10})
 
+        pose_frame = max(self.pose_predict, key=self.pose_predict.get)
         counts = [ShoulderP.times, Squat.times, BenchP.times, DeadL.times]
         self.count = np.max(counts)
 
@@ -111,7 +111,6 @@ class VideoProcessor:
             if self.prev_pose_frame != 'resting':
                 #interval 시간을 잼 그리고 일단 pose_state는 하던 운동임
                 self.r_time = time.time()
-                # self.pose_state = self.prev_pose_frame
             #그런데 interval 시간이 15초 이상이면
             if time.time() - self.r_time >self.rest_thresh:
                 #휴식시간이다. 지금까지 세트 운동 시간 기록.
@@ -119,6 +118,7 @@ class VideoProcessor:
                     self.workout_time = time.time() - self.w_time
                     self.workout = self.pose_state
                 self.pose_state = 'resting'
+                self.locked = False
 
 
         #현재 프레임이 운동중인 경우
@@ -148,8 +148,11 @@ class VideoProcessor:
             else:
                 #현 프레임 운동중, 현 pose_state 운동중
                 if np.max(counts):
-                    self.pose_state = ['shoulder', 'squat_down', 'bench_down', 'dead_down'][np.argmax(counts)]
-                    self.locked = True
+                    if self.pose_state != 'resting':
+                        self.pose_state = ['shoulder', 'squat_down', 'bench_down', 'dead_down'][np.argmax(counts)]
+                        self.locked = True
+                    else:
+                        self.locked = False
                 else:
                     self.pose_state = pose_frame
                     self.locked = False
@@ -163,10 +166,9 @@ class VideoProcessor:
         pos = self.pose_state
         frame = print_count(frame, height, width,
                             self.count, self.goal,
-                            str(pos), str(round(pose_predict[pos]*10)),
+                            str(pos), str(round(self.pose_predict[pos]*10)),
                             self.w_time, self.r_time,self.rest_thresh,
-                            self.debug,
-                            self.font_color)
+                            self.debug)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 

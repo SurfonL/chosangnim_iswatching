@@ -1,5 +1,5 @@
 import numpy as np
-from KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
+from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 
 
 class BenchP:
@@ -11,7 +11,7 @@ class BenchP:
 
     pose_embedder = FullBodyPoseEmbedder()
     pose_classifier = PoseClassifier(
-        pose_samples_folder='utils/pose_plots/bech',
+        pose_samples_folder='utils/pose_plots/bench',
         pose_embedder=pose_embedder,
         top_n_by_max_distance=30,
         top_n_by_mean_distance=10)
@@ -73,5 +73,5 @@ class BenchP:
         #draw things
         #frame = draw_bp(frame)
 
-        return frame
+        return frame, pose_predict
 

@@ -1,5 +1,5 @@
 import numpy as np
-from KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
+from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 
 
 class DeadL:
@@ -72,6 +72,6 @@ class DeadL:
         # draw things
         # frame = draw_bp(frame)
 
-        return frame
+        return frame, pose_predict
 
 

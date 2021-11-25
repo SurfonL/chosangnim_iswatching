@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from utils.Workouts import Workouts
+from utils.KnnClassif import FullBodyPoseEmbedder, PoseClassifier, EMADictSmoothing
 from utils.Drawing import drawing
 
 pos = {'nose': 0, 'right_shoulder' : 11, 'right_elbow' : 13,'right_wrist' : 15,
@@ -14,6 +14,14 @@ class ShoulderP:
     rate_l = 0
     font = cv2.FONT_HERSHEY_SIMPLEX
     state = False
+
+    pose_embedder = FullBodyPoseEmbedder()
+    pose_classifier = PoseClassifier(
+        pose_samples_folder='utils/pose_plots/shoulder',
+        pose_embedder=pose_embedder,
+        top_n_by_max_distance=30,
+        top_n_by_mean_distance=10)
+    smoother = EMADictSmoothing('utils/pose_plots/shoulder')
 
 
     @classmethod
@@ -159,8 +167,14 @@ class ShoulderP:
         return (lw,le,rw,re)
 
     @classmethod
-    def run_sp(cls, frame, landmarks):
+    def run_sp(cls, frame, pose_predict, landmarks, locked = False):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
+        if locked:
+            frame_height, frame_width = frame.shape[0], frame.shape[1]
+            landmarks_np = np.array([[lmk.x * frame_width, lmk.y * frame_height, lmk.z * frame_width]
+                                     for lmk in landmarks.landmark], dtype=np.float32)
+            pose_classification = cls.pose_classifier(landmarks_np)
+            pose_predict = cls.smoother(pose_classification)
 
         if all(cls.validity(landmarks.landmark)):
             cls.state = cls.sp_count(landmarks.landmark, cls.state)
@@ -170,4 +184,4 @@ class ShoulderP:
         frame = cls.draw_circle(frame, landmarks.landmark, frame_height, frame_width)
 
 
-        return frame
+        return frame, pose_predict

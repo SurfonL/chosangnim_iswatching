@@ -1,5 +1,5 @@
 from utils.Drawing import drawing
-from KnnClassif import FullBodyPoseEmbedder,PoseClassifier, EMADictSmoothing
+from utils.KnnClassif import FullBodyPoseEmbedder,PoseClassifier, EMADictSmoothing
 import numpy as np
 
 
@@ -86,5 +86,5 @@ class Squat:
         # draw things
         # frame = draw_bp(frame)
 
-        return frame
+        return frame, pose_predict
 
