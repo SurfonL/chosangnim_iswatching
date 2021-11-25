@@ -49,6 +49,10 @@ class VideoProcessor:
         self.iw = 60
         self.ia = 0.05
 
+
+        self.lw = 10
+        self.la = 0.1
+
         self.top_n_mean = 10
         self.top_n_max = 30
 
@@ -81,8 +85,8 @@ class VideoProcessor:
                     DeadL.set_thresh(self.ien, self.iex)
 
             else:
-                #locked
-                self.smoother.set_rate(10, 0.2)
+                #locked #TODO: 여기만 binary? ㅋㅋㅋㅋㅋㅋㅋ
+                self.smoother.set_rate(self.lw,self.la)
                 if self.pose_state == 'shoulder':
                     frame, self.count = ShoulderP.run_sp(frame, landmarks)
                 elif self.pose_state == 'squat_down':
@@ -203,6 +207,9 @@ def run():
             lew = col2.slider('locked ema window', value=10, min_value=0, max_value=100)
             lea = col2.slider('locked ema alpha', value=0.2, min_value=float(0), max_value=float(1))
 
+            top_mean_n = st.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
+            top_max_n = st.slider('top_n_max', value=70, min_value=10, max_value=150)
+
 
     goal = st.select_slider('How many?', [i for i in range(0, 21)])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
@@ -219,6 +226,11 @@ def run():
         ctx.video_processor.iex = ixs
         ctx.video_processor.iw = iew
         ctx.video_processor.ia= iea
+
+
+        ctx.video_processor.top_n_mean = top_mean_n
+        ctx.video_processor.top_n_max = top_max_n
+
 
 
 
