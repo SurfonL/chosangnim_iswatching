@@ -44,8 +44,8 @@ class VideoProcessor:
             model_complexity=self.mod_comp, )
         self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
         self.rest_thresh = 5
-        self.ien = 4
-        self.iex = 6
+        self.ien = 6
+        self.iex = 4
         self.iw = 60
         self.ia = 0.05
 
@@ -75,9 +75,9 @@ class VideoProcessor:
                 self.smoother.set_rate(self.iw,self.ia)
 
                 if pose_frame == 'shoulder':
-                    frame, self.count = ShoulderP.run_sp(frame,landmarks)
+                    frame, self.count = ShoulderP.run_sp(frame, landmarks)
                 elif pose_frame == 'squat_down':
-                    frame, self.count = Squat.run_sq(frame,pose_predict, landmarks)
+                    frame, self.count = Squat.run_sq(frame, pose_predict, landmarks)
                     Squat.set_thresh(self.ien, self.iex)
                 elif pose_frame == 'bench_down':
                     frame, self.count = BenchP.run_bp(frame, pose_predict, landmarks)
@@ -167,8 +167,7 @@ class VideoProcessor:
                             self.count, self.goal,
                             str(pos), str(round(pose_predict[pos]*10)),
                             self.w_time, self.r_time,self.rest_thresh,
-                            self.debug,
-                            self.font_color)
+                            self.debug)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 

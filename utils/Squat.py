@@ -1,5 +1,6 @@
 from utils.Drawing import drawing
-
+import cv2
+import numpy as np
 
 class Squat:
     _class_name = 'squat_down'
@@ -45,27 +46,41 @@ class Squat:
            cls.times += 1
            cls._pose_entered = False
 
+       print(pose_confidence)
+
     @classmethod
     def set_thresh(cls, enter, exit):
         cls._enter_threshold = enter
         cls._exit_threshold = exit
 
-
-    @staticmethod
-    def draw_circle(frame, landmarks):
+    @classmethod
+    def draw_circle(cls, frame, pose_predict, landmarks):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
         right_hip = landmarks.landmark[23]
         left_hip = landmarks.landmark[24]
-        frame = drawing.image_alpha(frame, right_hip.x * frame_width, right_hip.y * frame_height, 30, (0, 255, 0), 0.3,
-                                    1, 1)
-        frame = drawing.image_alpha(frame, left_hip.x * frame_width, left_hip.y * frame_height, 30, (0, 255, 0), 0.3, 1,
-                                    1)
+        if pose_predict > cls._enter_threshold:
+            frame = drawing.image_alpha(frame, right_hip.x * frame_width, right_hip.y * frame_height, 30, (0, 255, 0), 0.3,
+                                        1, 1)
+            frame = drawing.image_alpha(frame, left_hip.x * frame_width, left_hip.y * frame_height, 30, (0, 255, 0), 0.3, 1,
+                                        1)
+        elif pose_predict > cls._exit_threshold:
+            frame = drawing.image_alpha(frame, right_hip.x * frame_width, right_hip.y * frame_height, 30, (0, 255, 255),
+                                        0.3, pose_predict - cls._exit_threshold, cls._enter_threshold - cls._exit_threshold)
+            frame = drawing.image_alpha(frame, left_hip.x * frame_width, left_hip.y * frame_height, 30, (0, 255, 255),
+                                        0.3, pose_predict - cls._exit_threshold, cls._enter_threshold - cls._exit_threshold)
+        else:
+            frame = drawing.image_alpha(frame, right_hip.x * frame_width, right_hip.y * frame_height, 30, (255, 255, 255),
+                                        0.3, 1, 1)
+            frame = drawing.image_alpha(frame, left_hip.x * frame_width, left_hip.y * frame_height, 30, (255, 255, 255),
+                                        0.3, 1, 1)
+
         return frame
 
     @classmethod
     def run_sq(cls, frame, pose_predict, landmarks):
         cls.count(pose_predict)
-        cls.draw_circle(frame, landmarks)
+        frame = cls.draw_circle(frame, pose_predict[cls._class_name], landmarks)
+
         # draw things
         # frame = draw_bp(frame)
 
