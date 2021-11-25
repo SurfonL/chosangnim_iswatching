@@ -65,38 +65,35 @@ class VideoProcessor:
         start = time.time()
         frame, landmarks, height, width = self.Stdp.std_process(frame, width= None, height= None)
         if landmarks is not None:
-            frame = frame
-            pose_knn = self.Stdp.pose_class(landmarks,self.top_n_mean, self.top_n_max)
-            pose_predict = self.smoother(pose_knn)
-            pose_frame = max(pose_predict,key=pose_predict.get)
-            pose_prob = pose_predict[pose_frame]
-
             if not self.locked:
+                pose_knn = self.Stdp.pose_class(landmarks, self.top_n_mean, self.top_n_max)
+                pose_predict = self.smoother(pose_knn)
+                pose_frame = max(pose_predict, key=pose_predict.get)
                 self.smoother.set_rate(self.iw,self.ia)
 
                 if pose_frame == 'shoulder':
-                    frame, self.count = ShoulderP.run_sp(frame,landmarks)
+                    frame = ShoulderP.run_sp(frame,landmarks)
                 elif pose_frame == 'squat_down':
-                    frame, self.count = Squat.run_sq(frame,pose_predict, landmarks)
+                    frame = Squat.run_sq(frame,pose_predict, landmarks, self.locked)
                     Squat.set_thresh(self.ien, self.iex)
                 elif pose_frame == 'bench_down':
-                    frame, self.count = BenchP.run_bp(frame, pose_predict, landmarks)
+                    frame = BenchP.run_bp(frame, pose_predict, landmarks, self.locked)
                     BenchP.set_thresh(self.ien, self.iex)
                 elif pose_frame == 'dead_down':
-                    frame, self.count = DeadL.run_dl(frame, pose_predict, landmarks)
+                    frame = DeadL.run_dl(frame, pose_predict, landmarks, self.locked)
                     DeadL.set_thresh(self.ien, self.iex)
 
             else:
                 #locked #TODO: 여기만 binary? ㅋㅋㅋㅋㅋㅋㅋ
                 self.smoother.set_rate(self.lw,self.la)
                 if self.pose_state == 'shoulder':
-                    frame, self.count = ShoulderP.run_sp(frame, landmarks)
+                    frame = ShoulderP.run_sp(frame, landmarks)
                 elif self.pose_state == 'squat_down':
-                    frame, self.count = Squat.run_sq(frame, pose_predict, landmarks)
+                    frame = Squat.run_sq(frame, pose_predict, landmarks, self.locked)
                 elif self.pose_state == 'bench_down':
-                    frame, self.count = BenchP.run_bp(frame, pose_predict, landmarks)
+                    frame = BenchP.run_bp(frame, pose_predict, landmarks, self.locked)
                 elif self.pose_state == 'dead_down':
-                    frame, self.count = DeadL.run_dl(frame, pose_predict, landmarks)
+                    frame = DeadL.run_dl(frame, pose_predict, landmarks, self.locked)
 
 
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame
@@ -106,6 +103,7 @@ class VideoProcessor:
             pose_frame = max(pose_predict, key=pose_predict.get)
 
         counts = [ShoulderP.times, Squat.times, BenchP.times, DeadL.times]
+        self.count = np.max(counts)
 
         #현재 프레임이 resting인 경우
         if pose_frame == 'resting':
