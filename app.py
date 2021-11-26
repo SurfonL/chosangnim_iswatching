@@ -1,5 +1,4 @@
-import pandas as pd
-from streamlit_webrtc import webrtc_streamer, WebRtcMode
+from streamlit_webrtc import webrtc_streamer
 import streamlit as st
 import time
 import av
@@ -16,9 +15,7 @@ import numpy as np
 import pandas as pd
 
 frame = 15
-
 rn = round(random.random(),5)
-
 class VideoProcessor:
     def __init__(self):
         self.result_queue = queue.Queue()
@@ -46,9 +43,8 @@ class VideoProcessor:
         self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
 
         self.rest_thresh = 10
-        self.ien = 5
-        self.iex = 3
-
+        self.ien = 5.3
+        self.iex = 3.2
         self.iw = 60
         self.ia = 0.1
         self.len = 6
@@ -162,8 +158,7 @@ class VideoProcessor:
 
         self.prev_pose_frame = pose_frame
 
-
-
+        print(self.pose_predict)
         # print('takes', time.time()-start)
         self.result_queue.put(self.table)
         pos = self.pose_state
@@ -199,11 +194,11 @@ def run():
         debug = st.checkbox('Debug Mode')
         if debug:
             mdl_cp = st.slider('model complexity', value=2, min_value=0, max_value=2)
-            rest_thresh = st.slider('resting threshold', value = 5, min_value =1, max_value = 30)
+            rest_thresh = st.slider('resting threshold', value = 10, min_value =1, max_value = 30)
 
             col1, col2 = st.columns(2)
-            ins = col1.slider('initial enter sensitivity', value=6.0, min_value=float(0), max_value=float(10))
-            ixs = col1.slider('initial exit sensitivity', value=4.0, min_value=float(0), max_value=float(10))
+            ins = col1.slider('initial enter sensitivity', value=5.3, min_value=float(0), max_value=float(10))
+            ixs = col1.slider('initial exit sensitivity', value=3.2, min_value=float(0), max_value=float(10))
             iew = col1.slider('initial ema window', value=60, min_value=0, max_value=300)
             iea = col1.slider('initial ema alpha', value=0.1, min_value=float(0), max_value=float(1))
 
