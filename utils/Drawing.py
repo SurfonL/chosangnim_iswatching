@@ -95,37 +95,13 @@ class drawing:
             if landmark.visibility < visibility_th:
                 continue
 
-        # 右目
-        if landmark_point[1][0] > visibility_th and landmark_point[2][
-            0] > visibility_th:
-            cv.line(image, landmark_point[1][1], landmark_point[2][1],
-                    (0, 255, 0), 2)
-        if landmark_point[2][0] > visibility_th and landmark_point[3][
-            0] > visibility_th:
-            cv.line(image, landmark_point[2][1], landmark_point[3][1],
-                    (0, 255, 0), 2)
+        _WHITE = (224, 224, 224)
 
-        # 左目
-        if landmark_point[4][0] > visibility_th and landmark_point[5][
-            0] > visibility_th:
-            cv.line(image, landmark_point[4][1], landmark_point[5][1],
-                    (0, 255, 0), 2)
-        if landmark_point[5][0] > visibility_th and landmark_point[6][
-            0] > visibility_th:
-            cv.line(image, landmark_point[5][1], landmark_point[6][1],
-                    (0, 255, 0), 2)
-
-        # 口
-        if landmark_point[9][0] > visibility_th and landmark_point[10][
-            0] > visibility_th:
-            cv.line(image, landmark_point[9][1], landmark_point[10][1],
-                    (0, 255, 0), 2)
 
         # 肩
-        if landmark_point[11][0] > visibility_th and landmark_point[12][
-            0] > visibility_th:
+        if landmark_point[11][0] > visibility_th and landmark_point[12][0] > visibility_th and pose =='shoulder':
             cv.line(image, landmark_point[11][1], landmark_point[12][1],
-                    (0, 255, 0), 2)
+                    _WHITE, 2)
 
         # 右腕
         if landmark_point[11][0] > visibility_th and landmark_point[13][
