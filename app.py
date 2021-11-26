@@ -38,24 +38,26 @@ class VideoProcessor:
         self.debug = False
         self.goal = 0
         self.mod_comp = 2
-        self.Stdp = StandardProcess(
-            model_complexity=self.mod_comp, )
-        self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
-
         self.rest_thresh = 10
         self.ien = 5.3
         self.iex = 3.2
         self.iw = 60
         self.ia = 0.1
-        self.len = 6
-        self.lex = 4
+        self.len = 6.5
+        self.lex = 3.5
         self.lw = 30
         self.la = 0.3
-
         self.top_n_mean = 10
         self.top_n_max = 30
-
         self.font_color = (255,255,255)
+
+        self.min_det_conf = 0.5
+        self.min_trk_conf = 0.5
+        self.Stdp = StandardProcess(
+            model_complexity=self.mod_comp,
+            min_detection_confidence=self.min_det_conf,
+            min_tracking_confidence=self.min_trk_conf)
+        self.smoother = EMADictSmoothing('utils/fitness_poses_csvs_out')
 
 
 
@@ -63,6 +65,7 @@ class VideoProcessor:
     def recv(self, frame):
         start = time.time()
         frame, landmarks, height, width = self.Stdp.std_process(frame, width= None, height= None)
+
         if landmarks is not None:
             if not self.locked:
                 pose_knn = self.Stdp.pose_class(landmarks, self.top_n_mean, self.top_n_max)
@@ -76,7 +79,8 @@ class VideoProcessor:
                 BenchP.set_thresh(self.ien, self.iex)
                 frame, _ = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
                 DeadL.set_thresh(self.ien, self.iex)
-                drawing.annotation(frame, landmarks)
+                # drawing.annotation(frame, landmarks)
+                drawing.draw_lines(frame,landmarks,[0,1,2])
 
             else:
                 #locked
@@ -96,6 +100,7 @@ class VideoProcessor:
 
             #plot sticks if debug
             frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame
+
 
         else:
             self.pose_predict = self.smoother({'resting':10})
@@ -166,6 +171,7 @@ class VideoProcessor:
                             self.count, self.goal,
                             str(pos), str(round(self.pose_predict[pos]*10)),
                             self.w_time, self.r_time,self.rest_thresh,
+                            self.font_color,
                             self.debug)
         return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
@@ -202,15 +208,14 @@ def run():
             iew = col1.slider('initial ema window', value=60, min_value=0, max_value=300)
             iea = col1.slider('initial ema alpha', value=0.1, min_value=float(0), max_value=float(1))
 
-            lns = col2.slider('locked enter sensitivity', value=6.0, min_value=float(0), max_value=float(10))
-            lxs = col2.slider('locked exit sensitivity', value=4.0, min_value=float(0), max_value=float(10))
+            lns = col2.slider('locked enter sensitivity', value=6.5, min_value=float(0), max_value=float(10))
+            lxs = col2.slider('locked exit sensitivity', value=3.5, min_value=float(0), max_value=float(10))
             lew = col2.slider('locked ema window', value=30, min_value=0, max_value=100)
             lea = col2.slider('locked ema alpha', value=0.3, min_value=float(0), max_value=float(1))
+            top_mean_n = col1.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
+            top_max_n = col1.slider('top_n_max', value=70, min_value=10, max_value=100)
 
-            top_mean_n = st.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
-            top_max_n = st.slider('top_n_max', value=70, min_value=10, max_value=100)
-
-
+            f_color = st.color_picker('pick font color')
 
     goal = st.select_slider('How many?', [i for i in range(0, 21)])
     ctx = webrtc_streamer(key="example", video_processor_factory=VideoProcessor,
@@ -231,9 +236,11 @@ def run():
         ctx.video_processor.lw = lew
         ctx.video_processor.la = lea
         ctx.video_processor.mod_comp = mdl_cp
-
         ctx.video_processor.top_n_mean = top_mean_n
         ctx.video_processor.top_n_max = top_max_n
+        f_color = f_color.lstrip('#')
+        f_color = tuple(int(f_color[i:i + 2], 16) for i in (0, 2, 4))
+        ctx.video_processor.font_color = f_color
 
 
 

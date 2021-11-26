@@ -5,7 +5,8 @@ from utils.Drawing import drawing
 
 pos = {'nose': 0, 'right_shoulder' : 11, 'right_elbow' : 13,'right_wrist' : 15,
             'left_shoulder' : 12,'left_elbow' : 14,'left_wrist' : 16, 'right_hip' : 23,'right_knee' : 25,
-            'right_ankle' : 27, 'left_hip' : 24, 'left_knee' : 26, 'left_ankle' : 28 }
+            'right_ankle' : 27, 'left_hip' : 24, 'left_knee' : 26, 'left_ankle' : 28,
+       'left_index': 19, 'right_index': 20}
 class ShoulderP:
     _exit_threshold = 4
 
@@ -77,25 +78,25 @@ class ShoulderP:
 
     @classmethod
     def draw_circle(cls, frame, landmark, frame_height, frame_width):
-        right_wrist_x, right_wrist_y = landmark[pos['right_wrist']].x, landmark[pos['right_wrist']].y
-        left_wrist_x, left_wrist_y = landmark[pos['left_wrist']].x, landmark[pos['left_wrist']].y
-        right_wrist_x *= frame_width
-        right_wrist_y *= frame_height
-        left_wrist_x *= frame_width
-        left_wrist_y *= frame_height
+        right_index_x, right_index_y = landmark[pos['right_index']].x, landmark[pos['right_index']].y
+        left_index_x, left_index_y = landmark[pos['left_index']].x, landmark[pos['left_index']].y
+        right_index_x *= frame_width
+        right_index_y *= frame_height
+        left_index_x *= frame_width
+        left_index_y *= frame_height
 
         lw, le, rw, re = cls.validity(landmark)
 
         if cls.rate_l > 0 and cls.rate_r > 0:
-            if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
-            if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 0), 0.3, 1, 1)
+            if rw: frame = drawing.image_alpha(frame, right_index_x, right_index_y, 30, (0, 255, 0), 0.3, 1, 1)
+            if lw: frame = drawing.image_alpha(frame, left_index_x, left_index_y, 30, (0, 255, 0), 0.3, 1, 1)
         else:
             if cls.rate_r > -1 and cls.rate_l > -1:
-                if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_r), 1)
-                if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_l), 1)
+                if rw: frame = drawing.image_alpha(frame, right_index_x, right_index_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_r), 1)
+                if lw: frame = drawing.image_alpha(frame, left_index_x, left_index_y, 30, (0, 255, 255), 0.3, 1-abs(cls.rate_l), 1)
             else:
-                if rw: frame = drawing.image_alpha(frame, right_wrist_x, right_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
-                if lw: frame = drawing.image_alpha(frame, left_wrist_x, left_wrist_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
+                if rw: frame = drawing.image_alpha(frame, right_index_x, right_index_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
+                if lw: frame = drawing.image_alpha(frame, left_index_x, left_index_y, 30, (0, 255, 255), 0.3, 1, 1, fill = False)
         return frame
 
 
@@ -158,6 +159,7 @@ class ShoulderP:
         # blended = cv2.resize(cv2.flip(blended, 1), (1000, 1000))
         # return cv2.imshow('EfficientPose (Groos et al., 2020)', blended)
 
+
     @staticmethod
     def validity(landmark):
         lw= landmark[pos['left_wrist']].visibility >0
@@ -191,8 +193,5 @@ class ShoulderP:
             cls.state = cls.sp_count(landmarks.landmark, cls.state)
         else:
             pass
-
-
-
 
         return frame, pose_predict

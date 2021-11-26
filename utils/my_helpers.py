@@ -8,8 +8,11 @@ import numpy as np
 
 class StandardProcess:
 
-    def __init__(self, model_complexity):
-        self.pose = mp.solutions.pose.Pose(model_complexity=model_complexity)
+    def __init__(self, model_complexity, min_detection_confidence=0.5,
+            min_tracking_confidence=0.5):
+        self.pose = mp.solutions.pose.Pose(model_complexity=model_complexity,
+                                           min_detection_confidence=min_detection_confidence,
+                                           min_tracking_confidence=min_tracking_confidence)
         self.pose_embedder = FullBodyPoseEmbedder()
         self.pose_classifier = PoseClassifier(
             pose_samples_folder='utils/fitness_poses_csvs_out',
@@ -37,8 +40,8 @@ class StandardProcess:
 
         return pose_classification
 
-def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,rest_thresh, debug=True):
-    font_color = (255,255,255)
+def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,rest_thresh, font_color = (255,255,255), debug=True):
+
     if pose == 'bench':
         pose = 'bench press'
 
