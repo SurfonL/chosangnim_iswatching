@@ -7,7 +7,7 @@ from utils.ShoulderP import ShoulderP
 from utils.Squat import Squat
 from utils.BenchP import BenchP
 from utils.DeadL import DeadL
-from utils.my_helpers import StandardProcess, print_count, workout_row, draw_landmarks
+from utils.my_helpers import StandardProcess, print_count, workout_row
 from utils.KnnClassif import EMADictSmoothing
 from utils.Drawing import drawing
 import random
@@ -50,9 +50,10 @@ class VideoProcessor:
         self.top_n_mean = 10
         self.top_n_max = 30
         self.font_color = (255,255,255)
+        self.vis_thresh = 0.7
 
         self.min_det_conf = 0.5
-        self.min_trk_conf = 0.5
+        self.min_trk_conf = 0.75
         self.Stdp = StandardProcess(
             model_complexity=self.mod_comp,
             min_detection_confidence=self.min_det_conf,
@@ -65,6 +66,14 @@ class VideoProcessor:
     def recv(self, frame):
         start = time.time()
         frame, landmarks, height, width = self.Stdp.std_process(frame, width= None, height= None)
+        vis_sum = 0
+        if landmarks is not None:
+            for ld in landmarks.landmark:
+                vis_sum += ld.visibility
+            vis_av = vis_sum/33
+            # plot sticks if debug
+            frame = drawing.draw_landmarks(frame, landmarks, visibility_th=0.0) if self.debug else frame
+            landmarks = None if vis_av < self.vis_thresh else landmarks
 
         if landmarks is not None:
             if not self.locked:
@@ -79,27 +88,30 @@ class VideoProcessor:
                 BenchP.set_thresh(self.ien, self.iex)
                 frame, _ = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
                 DeadL.set_thresh(self.ien, self.iex)
-                # drawing.annotation(frame, landmarks)
-                drawing.draw_lines(frame,landmarks,[0,1,2])
+                drawing.annotation(frame, landmarks)
+
 
             else:
                 #locked
                 if self.pose_state == 'shoulder':
                     frame, l_pp = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
+                    drawing.draw_lines(frame, landmarks, [11,12,13,14,15,16,17,18,19,20,21,22])
                     ShoulderP.set_param(self.len,self.lex,self.lw,self.la)
                 elif self.pose_state == 'squat':
                     frame, l_pp = Squat.run_sq(frame, self.pose_predict, landmarks, self.locked)
+                    drawing.draw_lines(frame, landmarks,[16,14,12,11,13,15,23,24,25,26,27,28,29,30,31,32])
                     Squat.set_param(self.len, self.lex, self.lw, self.la)
                 elif self.pose_state == 'bench':
                     frame, l_pp = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
+                    drawing.draw_lines(frame, landmarks, [11,12,13,14,15,16,17,18,19,20,21,22,23,24])
                     BenchP.set_param(self.len, self.lex, self.lw, self.la)
                 elif self.pose_state == 'deadlift':
                     frame, l_pp = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
+                    drawing.draw_lines(frame, landmarks,[16, 14, 12, 11, 13, 15, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32])
                     DeadL.set_param(self.len, self.lex, self.lw, self.la)
                 self.pose_predict = self.smoother(l_pp)
 
-            #plot sticks if debug
-            frame = draw_landmarks(frame, landmarks, visibility_th=0.3) if self.debug else frame
+
 
 
         else:
@@ -214,6 +226,7 @@ def run():
             lea = col2.slider('locked ema alpha', value=0.3, min_value=float(0), max_value=float(1))
             top_mean_n = col1.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
             top_max_n = col1.slider('top_n_max', value=70, min_value=10, max_value=100)
+            vis_thresh = col2.slider('visualization threshold', value =0.6, min_value=float(0), max_value=float(1))
 
             f_color = st.color_picker('pick font color')
 
@@ -239,8 +252,10 @@ def run():
         ctx.video_processor.top_n_mean = top_mean_n
         ctx.video_processor.top_n_max = top_max_n
         f_color = f_color.lstrip('#')
-        f_color = tuple(int(f_color[i:i + 2], 16) for i in (0, 2, 4))
+        f_color = tuple(int(f_color[i:i + 2], 16) for i in (4, 2, 0))
+        ctx.video_processor.vis_thresh = vis_thresh
         ctx.video_processor.font_color = f_color
+
 
 
 

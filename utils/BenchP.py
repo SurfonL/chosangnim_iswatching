@@ -69,8 +69,8 @@ class BenchP:
     @classmethod
     def draw_circle(cls, frame, pose_predict, landmarks):
         frame_height, frame_width = frame.shape[0], frame.shape[1]
-        right_elbow = landmarks.landmark[13]
-        left_elbow = landmarks.landmark[14]
+        right_elbow = landmarks.landmark[19]
+        left_elbow = landmarks.landmark[20]
         if pose_predict > cls._enter_threshold:
             frame = drawing.image_alpha(frame, right_elbow.x * frame_width, right_elbow.y * frame_height, 30,
                                         (0, 255, 0),
