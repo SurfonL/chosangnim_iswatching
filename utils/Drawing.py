@@ -52,35 +52,36 @@ class drawing:
             full_connection,
             landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
 
+    # @staticmethod
+    # def draw_lines(image, landmarks, add_list):
+    #     mp_drawing = mp.solutions.drawing_utils
+    #     mp_drawing_styles = mp.solutions.drawing_styles
+    #     full_connection = [(15, 21), (16, 20), (18, 20), (3, 7), (14, 16), (23, 25), (28, 30), (11, 23), (27, 31),
+    #                        (6, 8), (15, 17), (24, 26), (16, 22), (4, 5), (5, 6), (29, 31), (12, 24), (23, 24), (
+    #                            0, 1), (9, 10), (1, 2), (0, 4), (11, 13), (30, 32), (28, 32), (15, 19), (16, 18),
+    #                        (25, 27), (26, 28), (12, 14), (17, 19), (2, 3), (11, 12), (27, 29), (13, 15)]
+    #     # [landmarks.landmark[i] for i in range(len(landmarks.landmark)) if i not in remove_list]
+    #
+    #     connection = []
+    #     for i in range(len(full_connection)):
+    #         a,b = full_connection[i]
+    #         if (a in add_list) or (b in add_list):
+    #             connection.append(full_connection[i])
+    #
+    #     mp_drawing.draw_landmarks(
+    #         image,
+    #         landmarks,
+    #         connection,
+    #         landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+
     @staticmethod
-    def draw_lines(image, landmarks, add_list):
-        mp_drawing = mp.solutions.drawing_utils
-        mp_drawing_styles = mp.solutions.drawing_styles
-        full_connection = [(15, 21), (16, 20), (18, 20), (3, 7), (14, 16), (23, 25), (28, 30), (11, 23), (27, 31),
-                           (6, 8), (15, 17), (24, 26), (16, 22), (4, 5), (5, 6), (29, 31), (12, 24), (23, 24), (
-                               0, 1), (9, 10), (1, 2), (0, 4), (11, 13), (30, 32), (28, 32), (15, 19), (16, 18),
-                           (25, 27), (26, 28), (12, 14), (17, 19), (2, 3), (11, 12), (27, 29), (13, 15)]
-        # [landmarks.landmark[i] for i in range(len(landmarks.landmark)) if i not in remove_list]
-
-        connection = []
-        for i in range(len(full_connection)):
-            a,b = full_connection[i]
-            if (a in add_list) or (b in add_list):
-                connection.append(full_connection[i])
-
-        mp_drawing.draw_landmarks(
-            image,
-            landmarks,
-            connection,
-            landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-
-    @staticmethod
-    def draw_landmarks_making(
+    def draw_lines(
             image,
             landmarks,
             # upper_body_only,
-            visibility_th=0.5,
-    ):
+            pose,
+            visibility_th=0.3):
+
         cv = cv2
         image_width, image_height = image.shape[1], image.shape[0]
 
@@ -98,117 +99,53 @@ class drawing:
         _WHITE = (224, 224, 224)
 
 
-        # 肩
-        if landmark_point[11][0] > visibility_th and landmark_point[12][0] > visibility_th and pose =='shoulder':
+        # 가슴
+        if landmark_point[11][0] > visibility_th and landmark_point[12][0] > visibility_th:
             cv.line(image, landmark_point[11][1], landmark_point[12][1],
                     _WHITE, 2)
 
-        # 右腕
-        if landmark_point[11][0] > visibility_th and landmark_point[13][
-            0] > visibility_th:
-            cv.line(image, landmark_point[11][1], landmark_point[13][1],
-                    (0, 255, 0), 2)
-        if landmark_point[13][0] > visibility_th and landmark_point[15][
-            0] > visibility_th:
-            cv.line(image, landmark_point[13][1], landmark_point[15][1],
-                    (0, 255, 0), 2)
+        if pose in ['shoulder','bench']:
+        # 오른팔
+            if landmark_point[11][0] > visibility_th and landmark_point[13][0] > visibility_th:
+                cv.line(image, landmark_point[11][1], landmark_point[13][1],_WHITE, 2)
+            if landmark_point[13][0] > visibility_th and landmark_point[15][0] > visibility_th:
+                cv.line(image, landmark_point[13][1], landmark_point[15][1],_WHITE, 2)
 
-        # 左腕
-        if landmark_point[12][0] > visibility_th and landmark_point[14][
-            0] > visibility_th:
-            cv.line(image, landmark_point[12][1], landmark_point[14][1],
-                    (0, 255, 0), 2)
-        if landmark_point[14][0] > visibility_th and landmark_point[16][
-            0] > visibility_th:
-            cv.line(image, landmark_point[14][1], landmark_point[16][1],
-                    (0, 255, 0), 2)
+            # 왼팔
+            if landmark_point[12][0] > visibility_th and landmark_point[14][0] > visibility_th:
+                cv.line(image, landmark_point[12][1], landmark_point[14][1],_WHITE, 2)
+            if landmark_point[14][0] > visibility_th and landmark_point[16][0] > visibility_th:
+                cv.line(image, landmark_point[14][1], landmark_point[16][1],_WHITE, 2)
+            # 오른손
+            if landmark_point[15][0] > visibility_th and landmark_point[19][0] > visibility_th:
+                cv.line(image, landmark_point[15][1], landmark_point[19][1],_WHITE, 2)
 
-        # 右手
-        if landmark_point[15][0] > visibility_th and landmark_point[17][
-            0] > visibility_th:
-            cv.line(image, landmark_point[15][1], landmark_point[17][1],
-                    (0, 255, 0), 2)
-        if landmark_point[17][0] > visibility_th and landmark_point[19][
-            0] > visibility_th:
-            cv.line(image, landmark_point[17][1], landmark_point[19][1],
-                    (0, 255, 0), 2)
-        if landmark_point[19][0] > visibility_th and landmark_point[21][
-            0] > visibility_th:
-            cv.line(image, landmark_point[19][1], landmark_point[21][1],
-                    (0, 255, 0), 2)
-        if landmark_point[21][0] > visibility_th and landmark_point[15][
-            0] > visibility_th:
-            cv.line(image, landmark_point[21][1], landmark_point[15][1],
-                    (0, 255, 0), 2)
+            # 왼손
+            if landmark_point[16][0] > visibility_th and landmark_point[20][0] > visibility_th:
+                cv.line(image, landmark_point[16][1], landmark_point[20][1],_WHITE, 2)
 
-        # 左手
-        if landmark_point[16][0] > visibility_th and landmark_point[18][
-            0] > visibility_th:
-            cv.line(image, landmark_point[16][1], landmark_point[18][1],
-                    (0, 255, 0), 2)
-        if landmark_point[18][0] > visibility_th and landmark_point[20][
-            0] > visibility_th:
-            cv.line(image, landmark_point[18][1], landmark_point[20][1],
-                    (0, 255, 0), 2)
-        if landmark_point[20][0] > visibility_th and landmark_point[22][
-            0] > visibility_th:
-            cv.line(image, landmark_point[20][1], landmark_point[22][1],
-                    (0, 255, 0), 2)
-        if landmark_point[22][0] > visibility_th and landmark_point[16][
-            0] > visibility_th:
-            cv.line(image, landmark_point[22][1], landmark_point[16][1],
-                    (0, 255, 0), 2)
+        # 몸통
+        if pose in ['squat','deadlift']:
+            if landmark_point[11][0] > visibility_th and landmark_point[23][0] > visibility_th:
+                cv.line(image, landmark_point[11][1], landmark_point[23][1],_WHITE, 2)
+            if landmark_point[12][0] > visibility_th and landmark_point[24][0] > visibility_th:
+                cv.line(image, landmark_point[12][1], landmark_point[24][1],_WHITE, 2)
+            if landmark_point[23][0] > visibility_th and landmark_point[24][0] > visibility_th:
+                cv.line(image, landmark_point[23][1], landmark_point[24][1],_WHITE, 2)
 
-        # 胴体
-        if landmark_point[11][0] > visibility_th and landmark_point[23][
-            0] > visibility_th:
-            cv.line(image, landmark_point[11][1], landmark_point[23][1],
-                    (0, 255, 0), 2)
-        if landmark_point[12][0] > visibility_th and landmark_point[24][
-            0] > visibility_th:
-            cv.line(image, landmark_point[12][1], landmark_point[24][1],
-                    (0, 255, 0), 2)
-        if landmark_point[23][0] > visibility_th and landmark_point[24][
-            0] > visibility_th:
-            cv.line(image, landmark_point[23][1], landmark_point[24][1],
-                    (0, 255, 0), 2)
+            # 오른 다리
+            if landmark_point[23][0] > visibility_th and landmark_point[25][0] > visibility_th:
+                cv.line(image, landmark_point[23][1], landmark_point[25][1],_WHITE, 2)
+            if landmark_point[25][0] > visibility_th and landmark_point[27][0] > visibility_th:
+                cv.line(image, landmark_point[25][1], landmark_point[27][1],_WHITE, 2)
 
-        if len(landmark_point) > 25:
-            # 右足
-            if landmark_point[23][0] > visibility_th and landmark_point[25][
-                0] > visibility_th:
-                cv.line(image, landmark_point[23][1], landmark_point[25][1],
-                        (0, 255, 0), 2)
-            if landmark_point[25][0] > visibility_th and landmark_point[27][
-                0] > visibility_th:
-                cv.line(image, landmark_point[25][1], landmark_point[27][1],
-                        (0, 255, 0), 2)
-            if landmark_point[27][0] > visibility_th and landmark_point[29][
-                0] > visibility_th:
-                cv.line(image, landmark_point[27][1], landmark_point[29][1],
-                        (0, 255, 0), 2)
-            if landmark_point[29][0] > visibility_th and landmark_point[31][
-                0] > visibility_th:
-                cv.line(image, landmark_point[29][1], landmark_point[31][1],
-                        (0, 255, 0), 2)
+            # 왼다리
+            if landmark_point[24][0] > visibility_th and landmark_point[26][0] > visibility_th:
+                cv.line(image, landmark_point[24][1], landmark_point[26][1],_WHITE, 2)
+            if landmark_point[26][0] > visibility_th and landmark_point[28][0] > visibility_th:
+                cv.line(image, landmark_point[26][1], landmark_point[28][1],_WHITE, 2)
 
-            # 左足
-            if landmark_point[24][0] > visibility_th and landmark_point[26][
-                0] > visibility_th:
-                cv.line(image, landmark_point[24][1], landmark_point[26][1],
-                        (0, 255, 0), 2)
-            if landmark_point[26][0] > visibility_th and landmark_point[28][
-                0] > visibility_th:
-                cv.line(image, landmark_point[26][1], landmark_point[28][1],
-                        (0, 255, 0), 2)
-            if landmark_point[28][0] > visibility_th and landmark_point[30][
-                0] > visibility_th:
-                cv.line(image, landmark_point[28][1], landmark_point[30][1],
-                        (0, 255, 0), 2)
-            if landmark_point[30][0] > visibility_th and landmark_point[32][
-                0] > visibility_th:
-                cv.line(image, landmark_point[30][1], landmark_point[32][1],
-                        (0, 255, 0), 2)
+
         return image
 
 

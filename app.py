@@ -34,7 +34,7 @@ class VideoProcessor:
         self.resting_time = 0
         self.workout_time = 0
 
-
+        #debug settings
         self.debug = False
         self.goal = 0
         self.mod_comp = 2
@@ -50,7 +50,8 @@ class VideoProcessor:
         self.top_n_mean = 10
         self.top_n_max = 30
         self.font_color = (255,255,255)
-        self.vis_thresh = 0.7
+        self.vis_thresh = 0.6
+
 
         self.min_det_conf = 0.5
         self.min_trk_conf = 0.8
@@ -95,19 +96,19 @@ class VideoProcessor:
                 #locked
                 if self.pose_state == 'shoulder':
                     frame, l_pp = ShoulderP.run_sp(frame, self.pose_predict, landmarks, self.locked)
-                    drawing.draw_lines(frame, landmarks, [11,12,13,14,15,16,17,18,19,20,21,22])
+                    drawing.draw_lines(frame, landmarks, self.pose_state)
                     ShoulderP.set_param(self.len,self.lex,self.lw,self.la)
                 elif self.pose_state == 'squat':
                     frame, l_pp = Squat.run_sq(frame, self.pose_predict, landmarks, self.locked)
-                    drawing.draw_lines(frame, landmarks,[16,14,12,11,13,15,23,24,25,26,27,28,29,30,31,32])
+                    drawing.draw_lines(frame, landmarks,self.pose_state)
                     Squat.set_param(self.len, self.lex, self.lw, self.la)
                 elif self.pose_state == 'bench':
                     frame, l_pp = BenchP.run_bp(frame, self.pose_predict, landmarks, self.locked)
-                    drawing.draw_lines(frame, landmarks, [11,12,13,14,15,16,17,18,19,20,21,22,23,24])
+                    drawing.draw_lines(frame, landmarks, self.pose_state)
                     BenchP.set_param(self.len, self.lex, self.lw, self.la)
                 elif self.pose_state == 'deadlift':
                     frame, l_pp = DeadL.run_dl(frame, self.pose_predict, landmarks, self.locked)
-                    drawing.draw_lines(frame, landmarks,[16, 14, 12, 11, 13, 15, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32])
+                    drawing.draw_lines(frame, landmarks, self.pose_state)
                     DeadL.set_param(self.len, self.lex, self.lw, self.la)
                 self.pose_predict = self.smoother(l_pp)
 
