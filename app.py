@@ -42,8 +42,8 @@ class VideoProcessor:
         self.rest_thresh = 10
         self.ien = 5.3
         self.iex = 3.2
-        self.iw = 60
-        self.ia = 0.1
+        self.iw = 100
+        self.ia = 0.08
         self.len = 6.5
         self.lex = 3.5
         self.lw = 30
