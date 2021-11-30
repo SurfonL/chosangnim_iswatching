@@ -181,7 +181,7 @@ class VideoProcessor:
                 else:
                     self.pose_state = pose_frame
                     self.locked = False
-
+        count = np.max(counts)
         self.prev_pose_frame = pose_frame
 
         print(self.pose_predict)
