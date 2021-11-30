@@ -51,7 +51,7 @@ class VideoProcessor:
         self.vis_thresh = 0.7
 
 
-        self.min_det_conf = 0.5
+        self.min_det_conf = 0.6
         self.min_trk_conf = 0.8
         self.Stdp = StandardProcess(
             model_complexity=self.mod_comp,
