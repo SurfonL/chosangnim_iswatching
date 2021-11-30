@@ -43,11 +43,11 @@ class VideoProcessor:
         self.debug = False
         self.goal = 0
         self.mod_comp = 2
-        self.rest_thresh = 10
+        self.rest_thresh = 5
         self.ien = 5.3
         self.iex = 3.2
         self.iw = 60
-        self.ia = 0.8
+        self.ia = 0.9
         self.len = 6.5
         self.lex = 3.5
         self.lw = 30
@@ -218,7 +218,7 @@ def run():
         debug = st.checkbox('Debug Mode')
         if debug:
             mdl_cp = st.slider('model complexity', value=2, min_value=0, max_value=2)
-            rest_thresh = st.slider('resting threshold', value = 10, min_value =1, max_value = 30)
+            rest_thresh = st.slider('resting threshold', value = 5, min_value =1, max_value = 30)
 
             col1, col2 = st.columns(2)
             ins = col1.slider('initial enter sensitivity', value=5.3, min_value=float(0), max_value=float(10))
