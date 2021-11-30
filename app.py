@@ -47,8 +47,8 @@ class VideoProcessor:
         self.ien = 5.3
         self.iex = 3.2
         self.iw = 60
-        self.ia = 0.9
-        self.len = 6.5
+        self.ia = 0.1
+        self.len = 8.5
         self.lex = 3.5
         self.lw = 30
         self.la = 0.3
