@@ -117,9 +117,6 @@ class VideoProcessor:
                     DeadL.set_param(self.len, self.lex, self.lw, self.la)
                 self.pose_predict = self.smoother(l_pp)
 
-
-
-
         else:
             self.pose_predict = self.smoother({'resting':10})
 
@@ -133,7 +130,7 @@ class VideoProcessor:
             if self.prev_pose_frame != 'resting':
                 #interval 시간을 잼 그리고 일단 pose_state는 하던 운동임
                 self.r_time = time.time()
-            #그런데 interval 시간이 15초 이상이면
+            #그런데 interval 시간이 thresh초 이상이면
             if time.time() - self.r_time >self.rest_thresh:
                 #휴식시간이다. 지금까지 세트 운동 시간 기록.
                 if self.pose_state != 'resting':
@@ -141,6 +138,12 @@ class VideoProcessor:
                     self.workout = self.pose_state
                 self.pose_state = 'resting'
                 self.locked = False
+            #interval 시간이 thresh 이하이므로 현재 state working out
+            elif np.max(counts):
+                if self.pose_state != 'resting':
+                    self.pose_state = ['shoulder', 'squat', 'bench', 'deadlift'][np.argmax(counts)]
+                    self.locked = True
+
 
 
         #현재 프레임이 운동중인 경우
