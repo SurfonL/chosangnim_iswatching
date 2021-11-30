@@ -24,10 +24,14 @@ class VideoProcessor:
         self.prev_pose_frame = 'resting'
         self.pose_state = 'resting'
         self.workout = 'resting'
+
+        #TODO: delte this and instaltiate them
         ShoulderP.times = 0
         DeadL.times = 0
         Squat.times = 0
         BenchP.times = 0
+
+
         self.set_no = 0
         self.r_time = 0
         self.w_time = 0
@@ -42,8 +46,8 @@ class VideoProcessor:
         self.rest_thresh = 10
         self.ien = 5.3
         self.iex = 3.2
-        self.iw = 100
-        self.ia = 0.08
+        self.iw = 60
+        self.ia = 0.8
         self.len = 6.5
         self.lex = 3.5
         self.lw = 30
