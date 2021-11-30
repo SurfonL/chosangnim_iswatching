@@ -24,7 +24,10 @@ class VideoProcessor:
         self.prev_pose_frame = 'resting'
         self.pose_state = 'resting'
         self.workout = 'resting'
-
+        ShoulderP.times = 0
+        DeadL.times = 0
+        Squat.times = 0
+        BenchP.times = 0
         self.set_no = 0
         self.r_time = 0
         self.w_time = 0
