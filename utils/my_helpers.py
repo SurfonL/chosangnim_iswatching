@@ -50,14 +50,14 @@ def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,
         text = str(count) + " to go"
     else:
         text = "Count: " + str(count)
-    f_size = height / 200
+    f_size = height / 300
     f_thick = int(f_size * 1.5)
     t_size, t_y = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
     frame = cv2.putText(frame, text, (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15)),
                         cv2.FONT_HERSHEY_SIMPLEX, f_size, font_color, f_thick)
 
-    f_size = height/400
-    f_thick = f_thick -1
+    f_size = height/450
+    f_thick = f_thick -1 if f_thick > 1 else 1
     t_size, t_y2 = cv2.getTextSize(pose, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
     frame = cv2.putText(frame, pose, (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15) +t_y*3),
                         cv2.FONT_HERSHEY_SIMPLEX, f_size, font_color, f_thick)
@@ -68,7 +68,7 @@ def print_count(frame,height,width,count, goal, pose, pose_prob, w_time, r_time,
         t = str(round(now-r_time,1))
     else:
         t = str(round(now-w_time,1))
-    f_size = height/400
+    f_size = height/450
     f_thick = f_thick -1
     t_size, _ = cv2.getTextSize(t, cv2.FONT_HERSHEY_SIMPLEX, f_size, f_thick)
     frame = cv2.putText(frame, t, (width - t_size[0] - int(width / 20), t_size[1] + int(height / 15) +t_y*3+t_y2*4),

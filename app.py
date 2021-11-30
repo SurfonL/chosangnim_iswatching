@@ -25,8 +25,6 @@ class VideoProcessor:
         self.pose_state = 'resting'
         self.workout = 'resting'
 
-        self.count = 0
-        self.count_rec = 0
         self.set_no = 0
         self.r_time = 0
         self.w_time = 0
@@ -50,7 +48,7 @@ class VideoProcessor:
         self.top_n_mean = 10
         self.top_n_max = 30
         self.font_color = (255,255,255)
-        self.vis_thresh = 0.6
+        self.vis_thresh = 0.7
 
 
         self.min_det_conf = 0.5
@@ -120,7 +118,7 @@ class VideoProcessor:
 
         pose_frame = max(self.pose_predict, key=self.pose_predict.get)
         counts = [ShoulderP.times, Squat.times, BenchP.times, DeadL.times]
-        self.count = np.max(counts)
+        count = np.max(counts)
 
         #현재 프레임이 resting인 경우
         if pose_frame == 'resting':
@@ -149,13 +147,13 @@ class VideoProcessor:
                 if self.r_time != 0:
                     self.resting_time = time.time() - self.r_time
                 #프레임이 운동중인데 pose_state도 운동중인 경우
-                if self.workout != 'resting' and self.count!=0:
+                if self.workout != 'resting' and count!=0:
                     self.set_no+=1
-                    row = workout_row(set_no=self.set_no, pose=self.workout, count=self.count,
+                    row = workout_row(set_no=self.set_no, pose=self.workout, count=count,
                                       set_duration=round(self.workout_time,2), rest_duration=round(self.resting_time-self.rest_thresh,2))
                     self.table = self.table.append(row)
 
-                self.count = 0
+                count = 0
                 ShoulderP.times = 0
                 DeadL.times = 0
                 Squat.times = 0
@@ -181,7 +179,7 @@ class VideoProcessor:
         self.result_queue.put(self.table)
         pos = self.pose_state
         frame = print_count(frame, height, width,
-                            self.count, self.goal,
+                            count, self.goal,
                             str(pos), str(round(self.pose_predict[pos]*10)),
                             self.w_time, self.r_time,self.rest_thresh,
                             self.font_color,
@@ -227,7 +225,7 @@ def run():
             lea = col2.slider('locked ema alpha', value=0.3, min_value=float(0), max_value=float(1))
             top_mean_n = col1.slider('top_n_mean', value = 50, min_value = 10, max_value = 100)
             top_max_n = col1.slider('top_n_max', value=70, min_value=10, max_value=100)
-            vis_thresh = col2.slider('visualization threshold', value =0.6, min_value=float(0), max_value=float(1))
+            vis_thresh = col2.slider('visualization threshold', value =0.7, min_value=float(0), max_value=float(1))
 
             f_color = st.color_picker('pick font color')
 
