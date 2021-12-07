@@ -1,0 +1,18 @@
+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
+=github token
+
+-kill port 80
+sudo kill -9 $(sudo lsof -t -i:80)
+
+https://velog.io/@ur-luella/tmux-%EC%82%AC%EC%9A%A9%EB%B2%95
+-tmux new session
+tmux new -s one
+-re attach
+tmux attach-session -t one
+-좌우로 나누기
+(ctrl + b) %
+- 스크롤하기
+ctrl + b + [
+-tmux 새 윈도우
+(ctrl + b) c
+
