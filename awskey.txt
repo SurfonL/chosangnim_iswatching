@@ -1,10 +1,3 @@
-AKIA4V3QIGHR3TKRYHAD
-보안 액세스 키:
-tZL4DqUrLK4lsregMJYqVSxB8gKgSugfD7ebyrCJ
-
-github token
-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
-
 cd /var/www/chosangnim_iswatching
 
 sudo service nginx restart
@@ -25,16 +18,6 @@ systemctl stop coturn
 vim logs/turnserver_2021-10-23.log
 
 streamlit run app.py --server.enableWebsocketCompression=false --server.enableXsrfProtection=false --server.enableCORS=false
-
-
-
-
-
-NS-1193.AWSDNS-21.ORG
-NS-1716.AWSDNS-22.CO.UK
-NS-27.AWSDNS-03.COM
-NS-543.AWSDNS-03.NET
-
 
 
 
